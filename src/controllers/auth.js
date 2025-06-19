@@ -25,8 +25,15 @@ async function Login(req, res) {
             { expiresIn: process.env.JWT_EXPIRES_IN || '1h' }
         );
         return res.status(200).send({
-            message: "login realizado com sucesso"
+            message: "login realizado com sucesso",
+            token,
+            user: {
+                id: user.id,
+                email: user.email,
+                name: user.name 
+            }
         });
+
     } catch (error) {
         console.error(error)
         return res.status(500).send({

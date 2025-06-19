@@ -1,27 +1,31 @@
 const {Schedule} = require('../models/schedule')
 
+async function ValidateCreateSchedule(req, res, next) {
+  const { name, service, date, time, observations } = req.body;
 
+  if (!name || !service || !date || !time || !observations) {
+    return res.status(400).send({
+      message: "Todos os campos são obrigatórios",
+    });
+  }
 
-async function ValidadeCreateSchedule(req,res,next){
-    if(!req.body.name || !req.body.service || !req.body.date || !req.body.time || !req.body.observations ){
-        return res.status(400).send({
-            message: "Todos os campos são obrigatorios"
-        });
-        }
+  const dateRegex = /^\d{4}-\d{2}-\d{2}$/; // YYYY-MM-DD (padrão para DateOnly do Sequelize)
+  if (!dateRegex.test(date)) {
+    return res.status(400).send({
+      message: "Data inválida. Use o formato YYYY-MM-DD.",
+    });
+  }
 
-        const dateRegex = /^\d{2}-\d{2}-\d{4}$/;
-        if (!dateRegex.test(req.body.date)) {
-        return res.status(400).send({
-            message: "Data inválida. Use o formato DD-MM-YYYY."
-        });
-        const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
-        if (!timeRegex.test(req.body.time)) {
-        return res.status(400).send({
-            message: "Hora inválida. Use o formato HH:MM."
-        });
-        }
-    }
+  const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/; // 24h format
+  if (!timeRegex.test(time)) {
+    return res.status(400).send({
+      message: "Hora inválida. Use o formato HH:MM.",
+    });
+  }
+
+  next();
 }
+
 module.exports = {
-    ValidadeCreateSchedule
-}
+  ValidateCreateSchedule,
+};
