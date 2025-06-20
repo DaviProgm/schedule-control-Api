@@ -91,9 +91,43 @@ async function DeleteSchedules(req, res) {
     }
 }
 
+async function UpdateScheduleStatus(req, res) {
+    try {
+        const { id } = req.params;
+        const { status } = req.body;
+
+        const statusValidos = ["agendado", "confirmado", "em andamento", "concluído", "cancelado"];
+        if (!statusValidos.includes(status)) {
+            return res.status(400).json({ message: "Status inválido." });
+        }
+
+        const [updated] = await Schedule.update(
+            { status },
+            { where: { id } }
+        );
+
+        if (updated === 0) {
+            return res.status(404).json({ message: "Agendamento não encontrado." });
+        }
+
+        const updatedSchedule = await Schedule.findByPk(id);
+
+        return res.status(200).json({
+            message: "Status atualizado com sucesso.",
+            schedule: updatedSchedule,
+        });
+    } catch (error) {
+        console.error("Erro ao atualizar status:", error);
+        return res.status(500).json({
+            message: "Erro ao atualizar status.",
+            error: error.message,
+        });
+    }
+}
 module.exports = {
     CreateSchedule,
     GetSchedules,
     UpdateSchedule,
-    DeleteSchedules
+    DeleteSchedules,
+    UpdateScheduleStatus
 };

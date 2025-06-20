@@ -24,14 +24,19 @@ const Schedule = sequelize.define('Schedule', {
     type: DataTypes.TEXT,
     allowNull: true,
   },
+  status: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    defaultValue: "agendado",
+  },
   userId: {
     type: DataTypes.INTEGER,
-    allowNull: true, 
+    allowNull: true,
     references: {
       model: 'users',
       key: 'id'
     }
-  }
+  },
 
 },
   {
@@ -40,7 +45,7 @@ const Schedule = sequelize.define('Schedule', {
     timestamps: true,
   });
 
-Schedule.belongsTo(User, { foreignKey: 'userID' });
+Schedule.belongsTo(User, { foreignKey: 'userId' });
 User.hasMany(Schedule, { foreignKey: 'userId' });
 
 module.exports = Schedule;
