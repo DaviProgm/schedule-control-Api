@@ -8,7 +8,6 @@ const { user } = require('./src/models');
 const UserRouter = require('./src/routes/users');
 const AuthRouter = require('./src/routes/auth')
 const scheduleRoutes = require('./src/routes/schedule');
-const notificationRoutes = require('./src/routes/notifications');
 
 
 app.use(cors());
@@ -20,8 +19,7 @@ app.use((req, res, next) => {
 
 app.use('/users', UserRouter);
 app.use('/auth', AuthRouter)
-app.use('/schedule', scheduleRoutes);
-app.use('/api', notificationRoutes)
+app.use(scheduleRoutes);
 
 app.listen(port, () => {
   console.log(`Servidor rodando na porta ${port}`);
