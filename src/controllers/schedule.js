@@ -1,16 +1,19 @@
 // controllers/schedule.js
 const Schedule = require('../models/schedule');
-
 async function CreateSchedule(req, res) {
     try {
         const { name, service, date, time, observations } = req.body;
+
+        const userId = req.userId;
 
         const schedule = await Schedule.create({
             name,
             service,
             date,
             time,
-            observations
+            observations,
+            userId: req.user.id,
+
         });
 
         return res.status(201).json({
@@ -18,7 +21,7 @@ async function CreateSchedule(req, res) {
             schedule
         });
     } catch (error) {
-        console.error("Erro ao criar agendamento:", error); // <<< Aqui
+        console.error("Erro ao criar agendamento:", error);
         return res.status(500).json({
             message: 'Erro ao criar agendamento.',
             error: error.message
@@ -27,16 +30,24 @@ async function CreateSchedule(req, res) {
 }
 async function GetSchedules(req, res) {
     try {
-        const schedules = await Schedule.findAll({ order: [['date', 'ASC'], ['time', 'ASC']] });
-        return res.status(200).json(schedules)
+        const userId = req.user.id;
+
+        const schedules = await Schedule.findAll({
+            where: { userId: req.user.id },
+            order: [['date', 'ASC'], ['time', 'ASC']],
+        });
+
+        return res.status(200).json(schedules);
     } catch (error) {
-        console.error("Erro ao buscar agendamentos", error)
-        res.status(500).send({
+        console.error("Erro ao buscar agendamentos", error);
+        return res.status(500).send({
             message: 'Erro ao buscar agendamentos',
             error: error.message
-        })
+        });
     }
 }
+
+
 async function UpdateSchedule(req, res) {
     try {
         const { id } = req.params;
@@ -56,7 +67,7 @@ async function UpdateSchedule(req, res) {
         console.error("erro ao atualizar agendamento", error)
         return res.status(500).send({
             message: "Erro interno ao atualizar agendamento.",
-            error:error.message
+            error: error.message
         });
     }
 }

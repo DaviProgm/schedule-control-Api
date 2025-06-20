@@ -4,7 +4,7 @@ const port = 4005;
 const cors = require('cors');
 
 
-const { User } = require('./src/models');
+const { user } = require('./src/models');
 const UserRouter = require('./src/routes/users');
 const AuthRouter = require('./src/routes/auth')
 const scheduleRoutes = require('./src/routes/schedule');

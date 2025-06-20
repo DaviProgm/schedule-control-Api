@@ -8,6 +8,6 @@ router.post('/register',
   middlewareUsers.ValidateCreateUser,
   UserController.CreateUser
 );
-
+ 
 
 module.exports = router;

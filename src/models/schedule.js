@@ -1,5 +1,7 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
+const { User } = require('./users');
+
 
 const Schedule = sequelize.define('Schedule', {
   name: {
@@ -15,17 +17,30 @@ const Schedule = sequelize.define('Schedule', {
     allowNull: false,
   },
   time: {
-    type: DataTypes.STRING, 
+    type: DataTypes.STRING,
     allowNull: false,
   },
   observations: {
-    type: DataTypes.TEXT, 
-    allowNull: true, 
+    type: DataTypes.TEXT,
+    allowNull: true,
   },
-}, {
-  tableName: 'schedules',
-  freezeTableName: true,
-  timestamps: true,
-});
+  userId: {
+    type: DataTypes.INTEGER,
+    allowNull: true, 
+    references: {
+      model: 'users',
+      key: 'id'
+    }
+  }
+
+},
+  {
+    tableName: 'schedules',
+    freezeTableName: true,
+    timestamps: true,
+  });
+
+Schedule.belongsTo(User, { foreignKey: 'userID' });
+User.hasMany(Schedule, { foreignKey: 'userId' });
 
 module.exports = Schedule;
