@@ -1,5 +1,6 @@
 const sequelize = require('../config/database');
 const User = require('./users');
+const Notification = require("./notifications")
 const Schedule = require('./schedule')
 
 async function initializeDatabase() {
@@ -16,5 +17,6 @@ initializeDatabase();
 module.exports = {
   sequelize,
   User,
-  Schedule
+  Schedule,
+  Notification
 };
