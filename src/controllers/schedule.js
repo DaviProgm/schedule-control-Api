@@ -71,8 +71,29 @@ async function UpdateSchedule(req, res) {
         });
     }
 }
+async function DeleteSchedules(req, res) {
+    try {
+        const { id } = req.params;
+
+        const schedule = await Schedule.findByPk(id);
+        if (!schedule) {
+            return res.status(404).json({ message: "agendamento não encontrado" })
+        }
+        await schedule.destroy();
+        return res.status(200).json({ message: "Agendamento excluído com sucesso." });
+
+    } catch (error) {
+        console.error("Erro ao excluir agendamento:", error);
+        return res.status(500).json({
+            message: "Erro ao excluir agendamento.",
+            error: error.message
+        });
+    }
+}
+
 module.exports = {
     CreateSchedule,
     GetSchedules,
-    UpdateSchedule
+    UpdateSchedule,
+    DeleteSchedules
 };
