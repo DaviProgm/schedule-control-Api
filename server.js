@@ -8,7 +8,7 @@ const { user } = require('./src/models');
 const UserRouter = require('./src/routes/users');
 const AuthRouter = require('./src/routes/auth')
 const scheduleRoutes = require('./src/routes/schedule');
-
+const ClientRouter = require('./src/routes/clients');
 
 app.use(cors());
 app.use(express.json());
@@ -20,6 +20,7 @@ app.use((req, res, next) => {
 app.use('/users', UserRouter);
 app.use('/auth', AuthRouter)
 app.use(scheduleRoutes);
+app.use(ClientRouter);
 
 app.listen(port, () => {
   console.log(`Servidor rodando na porta ${port}`);
