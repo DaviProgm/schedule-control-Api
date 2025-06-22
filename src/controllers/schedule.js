@@ -1,32 +1,32 @@
 // controllers/schedule.js
 const Schedule = require('../models/schedule');
 async function CreateSchedule(req, res) {
-    try {
-        const { name, service, date, time, observations } = req.body;
-
-        const userId = req.userId;
-
-        const schedule = await Schedule.create({
-            name,
-            service,
-            date,
-            time,
-            observations,
-            userId: req.user.id,
-
-        });
-
-        return res.status(201).json({
-            message: 'Agendamento criado com sucesso!',
-            schedule
-        });
-    } catch (error) {
-        console.error("Erro ao criar agendamento:", error);
-        return res.status(500).json({
-            message: 'Erro ao criar agendamento.',
-            error: error.message
-        });
+  try {
+    const { clientId, service, date, time, observations } = req.body;
+    if (!clientId || !service || !date || !time) {
+      return res.status(400).json({ message: "Campos obrigatórios faltando." });
     }
+
+    const schedule = await Schedule.create({
+      clientId,
+      service,
+      date,
+      time,
+      observations,
+      userId: req.user.id,
+    });
+
+    return res.status(201).json({
+      message: 'Agendamento criado com sucesso!',
+      schedule,
+    });
+  } catch (error) {
+    console.error("Erro ao criar agendamento:", error);
+    return res.status(500).json({
+      message: 'Erro ao criar agendamento.',
+      error: error.message,
+    });
+  }
 }
 async function GetSchedules(req, res) {
     try {
