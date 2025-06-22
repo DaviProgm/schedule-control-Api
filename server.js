@@ -10,7 +10,12 @@ const AuthRouter = require('./src/routes/auth')
 const scheduleRoutes = require('./src/routes/schedule');
 const ClientRouter = require('./src/routes/clients');
 
-app.use(cors());
+app.use(cors({
+  origin: 'http://localhost:8080',
+  methods: ['GET','POST','PUT','DELETE','OPTIONS'],
+  allowedHeaders: ['Content-Type','Authorization']
+}));
+
 app.use(express.json());
 app.use((req, res, next) => {
   console.log(`REQ: ${req.method} ${req.url}`);
