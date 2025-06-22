@@ -5,7 +5,7 @@ const Schedule = require('./schedule')
 async function initializeDatabase() {
   try {
     await sequelize.sync({ alter: true });
-    console.log('Banco sincronizado!');
+    console.log('Banco sincronizado!!');
   } catch (error) {
     console.error('Erro ao sincronizar banco:', error);
   }
