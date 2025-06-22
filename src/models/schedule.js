@@ -6,7 +6,7 @@ const { User } = require('./users');
 const Schedule = sequelize.define('Schedule', {
   name: {
     type: DataTypes.STRING,
-    allowNull: false,
+    allowNull: true,
   },
   service: {
     type: DataTypes.STRING,
