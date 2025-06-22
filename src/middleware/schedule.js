@@ -1,9 +1,9 @@
 async function ValidadeCreateSchedule(req, res, next) {
   const { name, service, date, time } = req.body;
 
-  if (!name || !service || !date || !time) {
+  if ( !service || !date || !time) {
     return res.status(400).send({
-      message: "Os campos name, service, date e time são obrigatórios."
+      message: "Os campos  service, date e time são obrigatórios."
     });
   }
 
