@@ -37,9 +37,16 @@ const Schedule = sequelize.define('Schedule', {
       key: 'id'
     }
   },
-
-},
-  {
+  clientId: {
+    type: DataTypes.INTEGER,
+    allowNull: true,  // aceita null temporariamente
+    references: {
+      model: 'clients',
+      key: 'id',
+    }
+  }
+  },
+{
     tableName: 'schedules',
     freezeTableName: true,
     timestamps: true,
