@@ -19,12 +19,6 @@ router.get('/agendamentos', (req, res) => {
   }
   return ScheduleController.GetSchedules(req, res);
 });
-router.get('/agendamentos', (req, res) => {
-  if (req.query.clientId) {
-    return ScheduleController.GetSchedulesByClient(req, res);
-  }
-  return ScheduleController.GetSchedules(req, res);
-});
 
 router.put(
   "/agendamentos/:id",
