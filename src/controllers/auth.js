@@ -33,7 +33,6 @@ async function Login(req, res) {
                 name: user.name 
             }
         });
-
     } catch (error) {
         console.error(error)
         return res.status(500).send({
