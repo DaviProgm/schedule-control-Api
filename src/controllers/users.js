@@ -25,6 +25,25 @@ async function CreateUser(req, res) {
     }
 }
 
+async function GetUsers(reqr, res) {
+    try {
+        const { role } = req.query;
+        let where = {};
+        if (role) {
+            where.role = role;
+        }
+        const users = await User.findAll({ where })
+        return res.status(200).json(users);
+    } catch (error) {
+        console.error("Erro ao buscar usuários", error);
+        return res.status(500).send({
+            message: 'Erro ao buscar usuários',
+            error: error.message
+        });
+    }
+}
+
 module.exports = {
-    CreateUser
+    CreateUser,
+    GetUsers
 };
