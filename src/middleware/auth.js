@@ -26,7 +26,7 @@ async function authMiddleware(req, res, next) {
     req.user = user; // disponibiliza o usuário para o próximo middleware/controller
     next();
   } catch (error) {
-    return res.status(401).json({ message: 'Token inválido ou expirado' });
+    return res.status(401).json({ message: 'Token inválido ou expirado!' });
   }
 }
 
