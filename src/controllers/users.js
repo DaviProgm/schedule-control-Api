@@ -25,7 +25,7 @@ async function CreateUser(req, res) {
     }
 }
 
-async function GetUsers(reqr, res) {
+async function GetUsers(req, res) {
     try {
         const { role } = req.query;
         let where = {};

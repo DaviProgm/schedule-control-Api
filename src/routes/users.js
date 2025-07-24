@@ -9,8 +9,8 @@ router.post('/register',
   middlewareUsers.ValidateCreateUser,
   UserController.CreateUser
 );
- router.get('/',
-UserController.GetUsers
- )
+router.get('/',
+  UserController.GetUsers
+)
 
 module.exports = router;
