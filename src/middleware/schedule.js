@@ -1,3 +1,5 @@
+const Schedule = require('../models/schedule');
+
 async function ValidadeCreateSchedule(req, res, next) {
   const { name, service, date, time } = req.body;
 
@@ -7,7 +9,7 @@ async function ValidadeCreateSchedule(req, res, next) {
     });
   }
 
-  const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+  const dateRegex = /^\d{4}-\d{2}-\d{2}$/;  
   if (!dateRegex.test(date)) {
     return res.status(400).send({
       message: "Data inválida. Use o formato YYYY-MM-DD."
@@ -25,6 +27,9 @@ async function ValidadeCreateSchedule(req, res, next) {
 }
 async function CheckScheduleExists(req, res, next) {
   const { id } = req.params;
+  const { date, time } = req.body;
+  const userId = req.user.id;
+  
   const exists = await Schedule.findOne({
     where: { userId, date, time }
   });
