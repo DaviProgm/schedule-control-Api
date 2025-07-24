@@ -152,6 +152,25 @@ async function GetSchedulesByClient(req, res) {
         return res.status(500).json({ message: "Erro interno ao buscar agendamentos." });
     }
 }
+    async function getSchedulesByProvider(req, res) {
+        try {
+            const { id } = req.query;
+            const schedules = await Schedule.findAll({
+                where: {
+                    userId: id,
+                    status: 'disponível'
+                },
+                order: [['date', 'ASC'], ['startTime', 'ASC']],
+            });
+            const provider = await User.findByPk(id, {
+                attributes: ['id', 'name', 'email', 'role']
+            });
+            return res.status(200).json({ provider, schedules });
+        } catch (error) {
+            console.error("Erro ao buscar agendamentos por prestador:", error);
+            return res.status(500).json({ message: "Erro interno ao buscar agendamentos." });
+        }
+    }
 
 
 module.exports = {
@@ -161,4 +180,5 @@ module.exports = {
     DeleteSchedules,
     UpdateScheduleStatus,
     GetSchedulesByClient,
+    getSchedulesByProvider,
 };

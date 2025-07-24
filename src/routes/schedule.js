@@ -29,5 +29,5 @@ router.put(
 router.delete('/agendamentos/:id', ScheduleController.DeleteSchedules);
 
 router.put('/agendamentos/:id/status', ScheduleController.UpdateScheduleStatus);
-
+router.get('/agendamentos/provedor', ScheduleController.getSchedulesByProvider)
 module.exports = router;
