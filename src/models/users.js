@@ -23,6 +23,11 @@ const User = sequelize.define('User', {
     type: DataTypes.STRING,
     allowNull: false,
   },
+  role: {
+    type: DataTypes.ENUM('customer', 'creditor'),
+    allowNull: false,
+    defaultValue: 'customer', 
+  }
 }, {
   tableName: 'users',      
   freezeTableName: true,   
