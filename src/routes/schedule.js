@@ -10,15 +10,20 @@ router.use(authMiddleware);
 router.post(
   '/agendamentos',
   ScheduleMiddleware.ValidadeCreateSchedule,
+  ScheduleMiddleware.CheckScheduleExists,
   ScheduleController.CreateSchedule
 );
 
 router.get('/agendamentos', (req, res) => {
   if (req.query.clientId) {
     return ScheduleController.GetSchedulesByClient(req, res);
+  } else if (req.query.provider) {
+    return ScheduleController.getSchedulesByProvider(req, res);
   }
   return ScheduleController.GetSchedules(req, res);
 });
+
+
 
 router.put(
   "/agendamentos/:id",
@@ -29,5 +34,4 @@ router.put(
 router.delete('/agendamentos/:id', ScheduleController.DeleteSchedules);
 
 router.put('/agendamentos/:id/status', ScheduleController.UpdateScheduleStatus);
-router.get('/agendamentos/provedor', ScheduleController.getSchedulesByProvider)
 module.exports = router;

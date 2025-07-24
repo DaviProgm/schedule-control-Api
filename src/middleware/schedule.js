@@ -1,7 +1,7 @@
 async function ValidadeCreateSchedule(req, res, next) {
   const { name, service, date, time } = req.body;
 
-  if ( !service || !date || !time) {
+  if (!service || !date || !time) {
     return res.status(400).send({
       message: "Os campos  service, date e time são obrigatórios."
     });
@@ -23,7 +23,20 @@ async function ValidadeCreateSchedule(req, res, next) {
 
   next();
 }
+async function CheckScheduleExists(req, res, next) {
+  const { id } = req.params;
+  const exists = await Schedule.findOne({
+    where: { userId, date, time }
+  });
+  if (exists) {
+    return res.status(400).json({ message: "Horário já ocupado para esse prestador." });
+  }
+  next();
+
+}
+
 
 module.exports = {
-  ValidadeCreateSchedule
+  ValidadeCreateSchedule,
+  CheckScheduleExists
 };

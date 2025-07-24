@@ -1,5 +1,6 @@
 const Schedule = require('../models/schedule');
 const Client = require('../models/clients');
+const  {User}  = require('../models/users');  
 
 async function CreateSchedule(req, res) {
     try {
@@ -153,24 +154,30 @@ async function GetSchedulesByClient(req, res) {
     }
 }
     async function getSchedulesByProvider(req, res) {
-        try {
-            const { id } = req.query;
-            const schedules = await Schedule.findAll({
-                where: {
-                    userId: id,
-                    status: 'disponível'
-                },
-                order: [['date', 'ASC'], ['startTime', 'ASC']],
-            });
-            const provider = await User.findByPk(id, {
-                attributes: ['id', 'name', 'email', 'role']
-            });
-            return res.status(200).json({ provider, schedules });
-        } catch (error) {
-            console.error("Erro ao buscar agendamentos por prestador:", error);
-            return res.status(500).json({ message: "Erro interno ao buscar agendamentos." });
+    try {
+        const { provider } = req.query; // pega o provider do query string
+        if (!provider) {
+            return res.status(400).json({ message: "Parâmetro provider é obrigatório." });
         }
+
+        const schedules = await Schedule.findAll({
+            where: {
+                userId: provider,
+                status: 'disponível'
+            },
+            order: [['date', 'ASC'], ['time', 'ASC']],
+        });
+
+        const providerData = await User.findByPk(provider, {
+            attributes: ['id', 'name', 'email', 'role']
+        });
+
+        return res.status(200).json({ provider: providerData, schedules });
+    } catch (error) {
+        console.error("Erro ao buscar agendamentos por prestador:", error);
+        return res.status(500).json({ message: "Erro interno ao buscar agendamentos." });
     }
+}
 
 
 module.exports = {
