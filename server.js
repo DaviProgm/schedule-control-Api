@@ -10,11 +10,7 @@ const AuthRouter = require('./src/routes/auth')
 const scheduleRoutes = require('./src/routes/schedule');
 const ClientRouter = require('./src/routes/clients');
 
-app.use(cors({
-  origin: 'cliente-agendamento-facil.vercel.app/', 
-  methods: ['GET','POST','PUT','DELETE','OPTIONS'],
-  allowedHeaders: ['Content-Type','Authorization']
-}));
+app.use(cors());
 
 app.use(express.json());
 app.use((req, res, next) => {
