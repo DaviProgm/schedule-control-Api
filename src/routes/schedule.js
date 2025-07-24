@@ -14,15 +14,11 @@ router.post(
   ScheduleController.CreateSchedule
 );
 
-router.get('/agendamentos', (req, res) => {
-  if (req.query.clientId) {
-    return ScheduleController.GetSchedulesByClient(req, res);
-  } else if (req.query.provider) {
-    return ScheduleController.getSchedulesByProvider(req, res);
-  }
-  return ScheduleController.GetSchedules(req, res);
-});
+router.get('/agendamentos', ScheduleController.GetSchedules);
 
+router.get('/agendamentos/cliente/:id', ScheduleController.GetSchedulesByClient);
+
+router.get('/agendamentos/provedor/:id', ScheduleController.getSchedulesByProvider);
 
 
 router.put(
