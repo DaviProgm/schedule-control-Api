@@ -7,7 +7,7 @@ async function CreateUser(req, res) {
     try {
         const { name, email, password, role } = req.body;
 
-        const validRoles = ['customer', 'provider'];
+        const validRoles = ['customer', 'provider', 'admin', 'creditor'];
         if (!validRoles.includes(role)) {
             return res.status(400).send({ message: "Role inválido. Use: customer, creditor ou admin" });
         }
