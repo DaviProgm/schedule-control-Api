@@ -38,4 +38,26 @@ coverage/
 # Misc
 *.tgz
 *.gz
-*.zipcloktrix-firebase-adminsdk-fbsvc-8b8a09a465.json
+*.zip
+
+##
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# Editor configs
+.vscode/
+.idea/
+.DS_Store
+
+# Firebase Admin SDK secret
+cloktrix-firebase-adminsdk-fbsvc-8b8a09a465.json
+
+# Sistema operacional
+Thumbs.db
+
+# Outros
+*.swp
+*.swo
