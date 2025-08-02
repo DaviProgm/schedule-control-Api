@@ -2,14 +2,12 @@ const express = require('express');
 const app = express();
 const port = 4005;
 const cors = require('cors');
-
-
+const notificationRoutes = require('./src/routes/notifications');
 const { user } = require('./src/models');
 const UserRouter = require('./src/routes/users');
 const AuthRouter = require('./src/routes/auth')
 const scheduleRoutes = require('./src/routes/schedule');
 const ClientRouter = require('./src/routes/clients');
-
 app.use(cors());
 
 app.use(express.json());
@@ -22,6 +20,7 @@ app.use('/users', UserRouter);
 app.use('/auth', AuthRouter)
 app.use(scheduleRoutes);
 app.use(ClientRouter);
+app.use(notificationRoutes);
 
 app.listen(port, () => {
   console.log(`Servidor rodando na porta ${port}`);
