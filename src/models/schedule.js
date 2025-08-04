@@ -37,12 +37,6 @@ const Schedule = sequelize.define('Schedule', {
       key: 'id'
     }
   },
-  notified: {
-    type: DataTypes.BOOLEAN,
-    allowNull: false,
-    defaultValue: false,
-  },
-
   clientId: {
     type: DataTypes.INTEGER,
     allowNull: true,  // aceita null temporariamente
@@ -51,8 +45,8 @@ const Schedule = sequelize.define('Schedule', {
       key: 'id',
     }
   }
-},
-  {
+  },
+{
     tableName: 'schedules',
     freezeTableName: true,
     timestamps: true,

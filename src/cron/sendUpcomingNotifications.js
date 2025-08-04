@@ -1,51 +1,41 @@
 const cron = require("node-cron");
-const { Op } = require("sequelize");
-const { Schedule, User } = require("../models"); // ✅ Corrigido
+const admin = require("../config/firebaseAdmin");
 const { sendPushNotification } = require("../services/sendNotification");
+const db = require("../models"); // Sequelize ou conexão com seu banco
 
+// Executa a cada minuto
 cron.schedule("* * * * *", async () => {
-  console.log("🔔 Verificando agendamentos próximos...");
+  console.log("Verificando agendamentos...");
 
   const now = new Date();
-  const oneHourLater = new Date(now.getTime() + 60 * 60 * 1000);
+  const oneHourLater = new Date(now.getTime() + 60 * 60 * 1000); // +1 hora
 
   try {
-    const upcomingAppointments = await Schedule.findAll({
+    const appointments = await db.Appointment.findAll({
       where: {
         date: {
-          [Op.between]: [now, oneHourLater],
+          [db.Sequelize.Op.between]: [now, oneHourLater],
         },
-        notified: false,
       },
       include: [
         {
-          model: User,
-          attributes: ["notificationToken", "name"],
+          model: db.User,
+          attributes: ["notificationToken"],
         },
       ],
     });
 
-    for (const appointment of upcomingAppointments) {
-      const user = appointment.User;
+    for (const appointment of appointments) {
+      const token = appointment.User?.notificationToken;
 
-      if (user?.notificationToken) {
-        try {
-          await sendPushNotification(user.notificationToken, {
-            title: "📅 Lembrete de Agendamento",
-            body: `Olá ${user.name}, você tem um agendamento às ${new Date(
-              appointment.date
-            ).toLocaleTimeString("pt-BR")}.`,
-            icon: "/logo.png",
-          });
-
-          appointment.notified = true;
-          await appointment.save();
-        } catch (pushError) {
-          console.error("Erro ao enviar notificação:", pushError);
-        }
+      if (token) {
+        await sendPushNotification(token, {
+          title: "Lembrete de agendamento",
+          body: `Você tem um agendamento às ${new Date(appointment.date).toLocaleTimeString()}.`,
+        });
       }
     }
   } catch (err) {
-    console.error("Erro no cron job de notificações:", err);
+    console.error("Erro ao enviar notificações:", err);
   }
 });
