@@ -23,6 +23,10 @@ const User = sequelize.define('User', {
     type: DataTypes.STRING,
     allowNull: false,
   },
+  notificationToken: {
+  type: DataTypes.STRING,
+  allowNull: true,
+},
   role: {
     type: DataTypes.ENUM('customer', 'provider'),
     allowNull: false,
