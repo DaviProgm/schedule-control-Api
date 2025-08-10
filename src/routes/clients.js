@@ -3,21 +3,22 @@ const express = require('express');
 
 
 const ClientController = require('../controllers/clients');
-const ClientMiddleware = require('../middleware/clients');
-const authMiddleware = require('../middleware/auth');
-const DeleteClient = require('../middleware/clients');
 const UpdateClient = require('../controllers/clients');
-
+const {
+  validateCreateClient,
+  validateUpdateClient,
+} = require('../middleware/clients');
+const authMiddleware = require('../middleware/auth');
 
 router.use(authMiddleware);
 
 router.post('/clientes',
-    ClientMiddleware.validateCreateClient,
+    validateCreateClient,
     ClientController.CreateClient
 );
 router.get('/clientes', ClientController.GetClients);
 router.put('/clientes/:id',
-    ClientMiddleware.validateUpdateClient,
+    validateUpdateClient,
     ClientController.UpdateClient
 );
 router.delete('/clientes/:id', ClientController.DeleteClient);
