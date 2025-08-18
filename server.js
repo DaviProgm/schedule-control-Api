@@ -5,11 +5,7 @@ const cors = require('cors');
 const notificationRoutes = require('./src/routes/notifications');
 const { user } = require('./src/models');
 const UserRouter = require('./src/routes/users');
-const AuthRouter = require('./src/routes/auth')
-const scheduleRoutes = require('./src/routes/schedule');
-const ClientRouter = require('./src/routes/clients');
-require("./src/cron/sendUpcomingNotifications");
-
+const AuthRouter = require('./
 app.use(cors());
 
 app.use(express.json());
