@@ -8,4 +8,6 @@ router.post('/subscriptions', SubscriptionController.createSubscription);
 
 router.get('/subscription', SubscriptionController.getSubscription);
 
+router.delete('/subscription', SubscriptionController.cancelSubscription);
+
 module.exports = router;

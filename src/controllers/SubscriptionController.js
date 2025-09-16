@@ -71,9 +71,47 @@ exports.getSubscription = async (req, res) => {
       return res.status(404).json({ message: "Nenhuma assinatura encontrada." });
     }
 
-    res.status(200).json(subscription);
+    let responseData = { subscription };
+
+    // Se a assinatura estiver pendente, busca a invoiceUrl da cobrança
+    if (subscription.status === 'pendente') {
+      const paymentsResponse = await axios.get(
+        `${ASAAS_API}/subscriptions/${subscription.asaasSubscriptionId}/payments`,
+        { headers: { 'access_token': ASAAS_TOKEN } }
+      );
+      const pendingPayment = paymentsResponse.data.data.find(p => p.status === 'PENDING' || p.status === 'OVERDUE');
+      if (pendingPayment) {
+        responseData.invoiceUrl = pendingPayment.invoiceUrl;
+      }
+    }
+
+    res.status(200).json(responseData);
   } catch (error) {
     console.error("Erro ao buscar assinatura:", error);
     res.status(500).json({ error: "Erro ao buscar assinatura" });
+  }
+};
+
+exports.cancelSubscription = async (req, res) => {
+  try {
+    const subscription = await Subscription.findOne({ where: { userId: req.user.id } });
+
+    if (!subscription) {
+      return res.status(404).json({ message: "Nenhuma assinatura encontrada para cancelar." });
+    }
+
+    // Cancel subscription on Asaas
+    await axios.delete(`${ASAAS_API}/subscriptions/${subscription.asaasSubscriptionId}`, {
+      headers: { 'access_token': ASAAS_TOKEN },
+    });
+
+    // Update local status
+    await subscription.update({ status: 'canceled' });
+
+    res.status(200).json({ message: "Assinatura cancelada com sucesso.", subscription });
+
+  } catch (error) {
+    console.error("Erro ao cancelar assinatura:", error.response?.data || error.message);
+    res.status(500).json({ error: "Erro ao cancelar assinatura" });
   }
 };
