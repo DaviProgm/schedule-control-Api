@@ -1,4 +1,4 @@
-const { User } = require('../models/users');
+const { User } = require('../models');
 
 async function ValidateCreateUser(req, res, next) {
   const { email, password } = req.body;
