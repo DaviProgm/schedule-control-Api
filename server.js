@@ -11,6 +11,8 @@ const scheduleRoutes = require('./src/routes/schedule');
 const ClientRouter = require('./src/routes/clients');
 const SubscriptionRouter = require('./src/routes/subscription');
 const WebhookRouter = require('./src/routes/webhook');
+const authMiddleware = require('./src/middleware/auth');
+const checkActiveSubscription = require('./src/middleware/subscription');
 require("./src/cron/sendUpcomingNotifications");
 
 app.use(cors());
@@ -23,7 +25,7 @@ app.use((req, res, next) => {
 
 app.use('/users', UserRouter);
 app.use('/auth', AuthRouter)
-app.use(scheduleRoutes);
+app.use('/agendamentos', authMiddleware, checkActiveSubscription, scheduleRoutes);
 app.use(ClientRouter);
 app.use(SubscriptionRouter);
 app.use(WebhookRouter);

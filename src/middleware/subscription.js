@@ -1,6 +1,7 @@
 const { Subscription } = require('../models');
 
 async function checkActiveSubscription(req, res, next) {
+  console.log(`--- Middleware de Assinatura Ativa executado para a rota: ${req.method} ${req.originalUrl} --`);
   try {
     const subscription = await Subscription.findOne({ where: { userId: req.user.id } });
 
