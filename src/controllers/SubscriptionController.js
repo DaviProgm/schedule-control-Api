@@ -5,7 +5,6 @@ const ASAAS_API = process.env.ASAAS_API_URL;
 const ASAAS_TOKEN = process.env.ASAAS_TOKEN;
 
 exports.createSubscription = async (req, res) => {
-  console.log("--- EXECUTANDO A VERSÃO MAIS RECENTE DO createSubscription ---");
   const { userId, plan } = req.body;
 
   if (!userId || !plan) {
