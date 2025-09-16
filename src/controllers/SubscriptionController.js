@@ -34,14 +34,27 @@ exports.createSubscription = async (req, res) => {
       }
     );
 
-    const subscription = await Subscription.create({
+    const asaasSubscription = response.data;
+
+    // Fetch the first payment details from Asaas
+    const paymentsResponse = await axios.get(
+      `${ASAAS_API}/subscriptions/${asaasSubscription.id}/payments`,
+      { headers: { 'access_token': ASAAS_TOKEN } }
+    );
+
+    const firstPayment = paymentsResponse.data.data[0];
+
+    const localSubscription = await Subscription.create({
       userId: user.id,
-      asaasSubscriptionId: response.data.id,
+      asaasSubscriptionId: asaasSubscription.id,
       plan,
       status: "pendente",
     });
 
-    res.status(200).json(subscription);
+    res.status(200).json({ 
+      subscription: localSubscription,
+      paymentInfo: firstPayment 
+    });
   } catch (error) {
     console.error("Erro ao criar assinatura:", error.response?.data || error.message);
     res.status(500).json({ error: "Erro ao criar assinatura" });
