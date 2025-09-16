@@ -1,13 +1,16 @@
+require('dotenv').config();
 const express = require('express');
 const app = express();
 const port = 4005;
 const cors = require('cors');
 const notificationRoutes = require('./src/routes/notifications');
-const { user } = require('./src/models');
+
 const UserRouter = require('./src/routes/users');
 const AuthRouter = require('./src/routes/auth')
 const scheduleRoutes = require('./src/routes/schedule');
 const ClientRouter = require('./src/routes/clients');
+const SubscriptionRouter = require('./src/routes/subscription');
+const WebhookRouter = require('./src/routes/webhook');
 require("./src/cron/sendUpcomingNotifications");
 
 app.use(cors());
@@ -22,6 +25,8 @@ app.use('/users', UserRouter);
 app.use('/auth', AuthRouter)
 app.use(scheduleRoutes);
 app.use(ClientRouter);
+app.use(SubscriptionRouter);
+app.use(WebhookRouter);
 app.use(notificationRoutes);
 
 app.listen(port, () => {

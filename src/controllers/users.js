@@ -1,11 +1,11 @@
 require("dotenv").config();
+const axios = require('axios');
 const bcrypt = require('bcrypt');
-
-const { User } = require('../models/users');
+const { User } = require('../models');
 
 async function CreateUser(req, res) {
     try {
-        const { name, email, password, role } = req.body;
+        const { name, email, password, role, cpfCnpj } = req.body;
 
         const validRoles = ['customer', 'provider', 'admin', 'creditor'];
         if (!validRoles.includes(role)) {
@@ -15,12 +15,30 @@ async function CreateUser(req, res) {
         const hashPassword = await bcrypt.hash(password, 10);
         const user = await User.create({ name, email, password: hashPassword, role });
 
+        // Create customer in Asaas
+        const asaasResponse = await axios.post(`${process.env.ASAAS_API_URL}/customers`, {
+            name,
+            email,
+            cpfCnpj
+        }, {
+            headers: {
+                'access_token': process.env.ASAAS_TOKEN
+            }
+        });
+
+        const asaasCustomerId = asaasResponse.data.id;
+
+        // Update user with asaasCustomerId
+        await user.update({ asaasCustomerId });
+
+        await user.reload(); // Recarrega os dados do usuário do banco
+
         return res.status(201).send(user);
     } catch (error) {
-        console.error('Erro ao criar usuário', error);
+        console.error('Erro ao criar usuário', error.response ? error.response.data : error.message);
         return res.status(500).send({
             message: "Erro ao criar usuário",
-            error: error.message
+            error: error.response ? error.response.data : error.message
         });
     }
 }

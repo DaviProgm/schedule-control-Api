@@ -31,6 +31,10 @@ const User = sequelize.define('User', {
     type: DataTypes.ENUM('customer', 'provider'),
     allowNull: false,
     defaultValue: 'customer', 
+  },
+  asaasCustomerId: {
+    type: DataTypes.STRING,
+    allowNull: true,
   }
 }, {
   tableName: 'users',      
@@ -38,5 +42,5 @@ const User = sequelize.define('User', {
 });
 
 
-module.exports = { User };
+module.exports = User;
 

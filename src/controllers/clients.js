@@ -1,10 +1,10 @@
-const Clients = require('../models/clients');
+const { Client } = require('../models');
 
 
 async function CreateClient(req, res) {
     const { name, email, phone, address } = req.body;
     try {
-        const client = await Clients.create({
+        const client = await Client.create({
             name,
             email,
             phone,
@@ -28,7 +28,7 @@ async function CreateClient(req, res) {
 }
 async function GetClients(req, res) {
     try {
-        const clients = await Clients.findAll({
+        const clients = await Client.findAll({
             where: { userId: req.user.id },
             order: [['name', 'ASC']],
         });
@@ -46,7 +46,7 @@ async function UpdateClient(req, res) {
         const { id } = req.params;
         const { name, email, phone, address } = req.body;
 
-        const client = await Clients.findByPk(id);
+        const client = await Client.findByPk(id);
         if (!client) {
             return res.status(404).send({ message: "Cliente não encontrado" });
         }
@@ -68,7 +68,7 @@ async function DeleteClient(req, res) {
     try {
         const { id } = req.params;
 
-        const client = await Clients.findByPk(id);
+        const client = await Client.findByPk(id);
         if (!client) {
             return res.status(404).send({ message: "Cliente não encontrado" });
         }

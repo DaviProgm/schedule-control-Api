@@ -1,6 +1,6 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
-const { User } = require('./users');
+const User = require('./users');
 
 
 const Schedule = sequelize.define('Schedule', {

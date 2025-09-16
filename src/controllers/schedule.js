@@ -1,6 +1,4 @@
-const Schedule = require('../models/schedule');
-const Client = require('../models/clients');
-const  {User}  = require('../models/users');  
+const { Schedule, Client, User } = require('../models');  
 
 async function CreateSchedule(req, res) {
     try {

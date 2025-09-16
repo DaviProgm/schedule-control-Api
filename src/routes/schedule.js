@@ -4,8 +4,9 @@ const router = express.Router();
 const ScheduleController = require("../controllers/schedule");
 const ScheduleMiddleware = require("../middleware/schedule");
 const authMiddleware = require('../middleware/auth');
+const checkActiveSubscription = require('../middleware/subscription');
 
-router.use(authMiddleware);
+router.use(authMiddleware, checkActiveSubscription);
 
 router.post(
   '/agendamentos',

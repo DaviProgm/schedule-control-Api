@@ -1,4 +1,4 @@
-const { User } = require('../models/users')
+const { User } = require('../models')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 require('dotenv').config();
@@ -35,7 +35,7 @@ async function Login(req, res) {
             }
         });
     } catch (error) {
-        console.error(error)
+        console.error('DETAILED LOGIN ERROR:', error)
         return res.status(500).send({
             message: "Erro ao fazer login",
             error: error.message

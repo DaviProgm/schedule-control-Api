@@ -8,7 +8,6 @@ cron.schedule("* * * * *", async () => {
 
   const now = new Date();
   const oneHourLater = new Date(now.getTime() + 60 * 60 * 1000);
-
   try {
     const appointments = await db.Appointment.findAll({
       where: {

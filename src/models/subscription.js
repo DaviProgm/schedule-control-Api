@@ -1,6 +1,6 @@
 const sequelize = require("../config/database");
-const { DataTypes } = require(sequelize)
-const { User } = require('./users');
+const { DataTypes } = require('sequelize')
+const User = require('./users');
 
 
 const Subscription = sequelize.define('Subscription', {
@@ -30,7 +30,7 @@ const Subscription = sequelize.define('Subscription', {
         }
     }
 }, {
-    tableName: 'subscription',
+    tableName: 'subscriptions',
     freezeTableName: true,
     timestamps: true
 });

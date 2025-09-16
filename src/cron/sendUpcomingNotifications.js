@@ -11,7 +11,7 @@ cron.schedule("* * * * *", async () => {
   const oneHourLater = new Date(now.getTime() + 60 * 60 * 1000); // +1 hora
 
   try {
-    const appointments = await db.Appointment.findAll({
+    const schedules = await db.Schedule.findAll({
       where: {
         date: {
           [db.Sequelize.Op.between]: [now, oneHourLater],
@@ -25,13 +25,13 @@ cron.schedule("* * * * *", async () => {
       ],
     });
 
-    for (const appointment of appointments) {
-      const token = appointment.User?.notificationToken;
+    for (const schedule of schedules) {
+      const token = schedule.User?.notificationToken;
 
       if (token) {
         await sendPushNotification(token, {
           title: "Lembrete de agendamento",
-          body: `Você tem um agendamento às ${new Date(appointment.date).toLocaleTimeString()}.`,
+          body: `Você tem um agendamento às ${new Date(schedule.date).toLocaleTimeString()}.`,
         });
       }
     }

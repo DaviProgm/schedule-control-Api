@@ -1,9 +1,8 @@
 const axios = require("axios");
-const { Subscription } = require("../models/subscription");
-const { User } = require("../models/users");
+const { Subscription, User } = require("../models");
 
-const ASAAS_API = "https://sandbox.asaas.com/api/v3"; // ou produção
-const ASAAS_TOKEN = "SUA_CHAVE_API";
+const ASAAS_API = process.env.ASAAS_API_URL;
+const ASAAS_TOKEN = process.env.ASAAS_TOKEN;
 
 exports.createSubscription = async (req, res) => {
   const { userId, plan } = req.body;
@@ -18,7 +17,7 @@ exports.createSubscription = async (req, res) => {
       return res.status(404).json({ error: "Usuário não encontrado ou sem customerId do Asaas" });
     }
 
-    const value = plan === "pro" ? 99.90 : 49.90;
+    const value = plan === "pro" ? 49.99 : 29.99;
 
     const response = await axios.post(
       `${ASAAS_API}/subscriptions`,
@@ -31,7 +30,7 @@ exports.createSubscription = async (req, res) => {
         description: `Plano ${plan} - SaaS Agenda`,
       },
       {
-        headers: { Authorization: `Bearer ${ASAAS_TOKEN}` },
+        headers: { 'access_token': ASAAS_TOKEN },
       }
     );
 
@@ -39,12 +38,27 @@ exports.createSubscription = async (req, res) => {
       userId: user.id,
       asaasSubscriptionId: response.data.id,
       plan,
-      status: "pending",
+      status: "pendente",
     });
 
     res.status(200).json(subscription);
   } catch (error) {
     console.error("Erro ao criar assinatura:", error.response?.data || error.message);
     res.status(500).json({ error: "Erro ao criar assinatura" });
+  }
+};
+
+exports.getSubscription = async (req, res) => {
+  try {
+    const subscription = await Subscription.findOne({ where: { userId: req.user.id } });
+
+    if (!subscription) {
+      return res.status(404).json({ message: "Nenhuma assinatura encontrada." });
+    }
+
+    res.status(200).json(subscription);
+  } catch (error) {
+    console.error("Erro ao buscar assinatura:", error);
+    res.status(500).json({ error: "Erro ao buscar assinatura" });
   }
 };
