@@ -52,6 +52,8 @@ exports.createSubscription = async (req, res) => {
     });
 
     res.status(200).json({ 
+      version: 2,
+      code_is_updated: true,
       subscription: localSubscription,
       paymentInfo: firstPayment 
     });
