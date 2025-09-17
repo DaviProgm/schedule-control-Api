@@ -1,5 +1,6 @@
 require('dotenv').config();
 const express = require('express');
+const sequelize = require('./src/config/database');
 const app = express();
 const port = 4005;
 const cors = require('cors');
@@ -32,6 +33,10 @@ app.use(SubscriptionRouter);
 app.use(WebhookRouter);
 app.use(notificationRoutes);
 app.use('/support-tickets', authMiddleware, SupportTicketRouter);
+
+sequelize.sync({ alter: true }).then(() => {
+  console.log('Banco de dados sincronizado');
+});
 
 app.listen(port, () => {
   console.log(`Servidor rodando na porta ${port}`);
