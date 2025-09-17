@@ -2,6 +2,7 @@ const { Subscription } = require('../models/subscription');
 const { Payment } = require('../models/payment');
 
 exports.handleAsaasWebhook = async (req, res) => {
+    console.log('Webhook Asaas recebido:', req.body);
     const { event, payment } = req.body;
 
     if (!event || !payment) {
