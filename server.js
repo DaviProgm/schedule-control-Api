@@ -18,7 +18,9 @@ const authMiddleware = require('./src/middleware/auth');
 const checkActiveSubscription = require('./src/middleware/subscription');
 require("./src/cron/sendUpcomingNotifications");
 
-app.use(cors());
+app.use(cors({
+  origin: '*'
+}));
 
 app.use(express.json());
 app.use((req, res, next) => {
