@@ -11,6 +11,7 @@ const scheduleRoutes = require('./src/routes/schedule');
 const ClientRouter = require('./src/routes/clients');
 const SubscriptionRouter = require('./src/routes/subscription');
 const WebhookRouter = require('./src/routes/webhook');
+const SupportTicketRouter = require('./src/routes/supportTicket');
 const authMiddleware = require('./src/middleware/auth');
 const checkActiveSubscription = require('./src/middleware/subscription');
 require("./src/cron/sendUpcomingNotifications");
@@ -30,6 +31,7 @@ app.use(ClientRouter);
 app.use(SubscriptionRouter);
 app.use(WebhookRouter);
 app.use(notificationRoutes);
+app.use('/support-tickets', authMiddleware, SupportTicketRouter);
 
 app.listen(port, () => {
   console.log(`Servidor rodando na porta ${port}`);
