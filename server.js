@@ -1,4 +1,5 @@
 require('dotenv').config();
+console.log('MAIL_HOST:', process.env.MAIL_HOST);
 const express = require('express');
 const sequelize = require('./src/config/database');
 const app = express();
