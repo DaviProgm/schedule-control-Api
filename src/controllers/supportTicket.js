@@ -1,4 +1,5 @@
-const { SupportTicket } = require('../models');
+const { SupportTicket, User } = require('../models');
+const transporter = require('../config/mailer');
 
 async function createSupportTicket(req, res) {
   try {
@@ -14,6 +15,25 @@ async function createSupportTicket(req, res) {
       message,
       userId,
     });
+
+    const user = await User.findByPk(userId);
+
+    // Send email notification
+    const mailOptions = {
+      from: process.env.MAIL_USER, // sender address
+      to: 'workgate.oficial@gmail.com', // list of receivers
+      subject: `Novo Chamado de Suporte: ${subject}`,
+      html: `
+        <h1>Novo Chamado de Suporte Recebido</h1>
+        <p><b>De:</b> ${user.name} (${user.email})</p>
+        <p><b>Assunto:</b> ${subject}</p>
+        <hr>
+        <p><b>Mensagem:</b></p>
+        <p>${message}</p>
+      `
+    };
+
+    await transporter.sendMail(mailOptions);
 
     return res.status(201).json({
       message: 'Chamado de suporte criado com sucesso!',
