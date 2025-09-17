@@ -1,5 +1,6 @@
 const { SupportTicket, User } = require('../models');
-const transporter = require('../config/mailer');
+const sgMail = require('@sendgrid/mail');
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 async function createSupportTicket(req, res) {
   try {
@@ -18,10 +19,10 @@ async function createSupportTicket(req, res) {
 
     const user = await User.findByPk(userId);
 
-    // Send email notification
-    const mailOptions = {
-      from: process.env.MAIL_USER, // sender address
-      to: 'workgate.oficial@gmail.com', // list of receivers
+    // Send email notification with SendGrid
+    const msg = {
+      to: 'workgate.oficial@gmail.com', // Change to your recipient
+      from: process.env.SENDGRID_FROM_EMAIL, // Change to your verified sender
       subject: `Novo Chamado de Suporte: ${subject}`,
       html: `
         <h1>Novo Chamado de Suporte Recebido</h1>
@@ -30,10 +31,10 @@ async function createSupportTicket(req, res) {
         <hr>
         <p><b>Mensagem:</b></p>
         <p>${message}</p>
-      `
+      `,
     };
 
-    await transporter.sendMail(mailOptions);
+    await sgMail.send(msg);
 
     return res.status(201).json({
       message: 'Chamado de suporte criado com sucesso!',
@@ -41,6 +42,9 @@ async function createSupportTicket(req, res) {
     });
   } catch (error) {
     console.error("Erro ao criar chamado de suporte:", error);
+    if (error.response) {
+      console.error(error.response.body)
+    }
     return res.status(500).json({
       message: 'Erro ao criar chamado de suporte.',
       error: error.message,

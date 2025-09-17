@@ -2,7 +2,8 @@ const { User } = require('../models')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const crypto = require('crypto');
-const transporter = require('../config/mailer');
+const sgMail = require('@sendgrid/mail');
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 const { Sequelize } = require('sequelize');
 require('dotenv').config();
 
@@ -61,9 +62,9 @@ async function forgotPassword(req, res) {
             passwordResetExpires: Date.now() + 3600000, // 1 hour
         });
 
-        const mailOptions = {
+        const msg = {
             to: user.email,
-            from: process.env.MAIL_USER,
+            from: process.env.SENDGRID_FROM_EMAIL,
             subject: 'Recuperação de Senha',
             text: `Você está recebendo este e-mail porque você (ou outra pessoa) solicitou a recuperação da senha da sua conta.\n\n` +
                 `Por favor, clique no link a seguir, ou cole no seu navegador para completar o processo:\n\n` +
@@ -71,7 +72,7 @@ async function forgotPassword(req, res) {
                 `Se você não solicitou isso, por favor, ignore este e-mail e sua senha permanecerá inalterada.\n`
         };
 
-        await transporter.sendMail(mailOptions);
+        await sgMail.send(msg);
 
         res.status(200).send({ message: 'Um e-mail foi enviado para ' + user.email + ' com mais instruções.' });
     } catch (error) {
@@ -102,15 +103,15 @@ async function resetPassword(req, res) {
             passwordResetExpires: null,
         });
 
-        const mailOptions = {
+        const msg = {
             to: user.email,
-            from: process.env.MAIL_USER,
+            from: process.env.SENDGRID_FROM_EMAIL,
             subject: 'Sua senha foi alterada',
             text: `Olá,\n\n` +
                 `Esta é uma confirmação de que a senha para sua conta ${user.email} foi alterada com sucesso.\n`
         };
 
-        await transporter.sendMail(mailOptions);
+        await sgMail.send(msg);
 
         res.status(200).send({ message: 'Senha alterada com sucesso!' });
     } catch (error) {
