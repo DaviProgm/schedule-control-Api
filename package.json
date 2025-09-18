@@ -12,6 +12,7 @@
   "license": "ISC",
   "keywords": [],
   "dependencies": {
+    "@sendgrid/mail": "^8.1.5",
     "axios": "^1.11.0",
     "bcrypt": "^6.0.0",
     "cors": "^2.8.5",
