@@ -1,14 +1,15 @@
 const { Subscription, Payment } = require('../models');
 
+const ASAAS_WEBHOOK_TOKEN = process.env.ASAAS_WEBHOOK_TOKEN || "workgate";
+
 exports.handleAsaasWebhook = async (req, res) => {
-  // --- VALIDAÇÃO DO TOKEN DE AUTENTICAÇÃO ---
-  const ASAAS_WEBHOOK_TOKEN = "workgate"; // o mesmo que você configurou no Asaas
   const tokenRecebido = req.headers["x-api-key"];
 
   if (tokenRecebido !== ASAAS_WEBHOOK_TOKEN) {
-    console.warn("Token inválido no webhook:", tokenRecebido);
     return res.status(401).send("Unauthorized");
   }
+
+
 
   // --- PROCESSAMENTO NORMAL DO WEBHOOK ---
   const { event, payment } = req.body;
