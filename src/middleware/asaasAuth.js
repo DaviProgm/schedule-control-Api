@@ -1,10 +1,18 @@
 require('dotenv').config();
 
 function asaasAuth(req, res, next) {
-  const token = req.headers['asaas-access-token'];
-  const expectedToken = process.env.ASAAS_WEBHOOK_TOKEN;
+  const receivedToken =
+    req.headers['asaas-access-token'] ||
+    req.headers['access_token'];
 
-  if (!token || token !== expectedToken) {
+  let expectedToken = (process.env.ASAAS_WEBHOOK_TOKEN || '').trim().replace(/^"|"$/g, '');
+
+  if (!receivedToken || receivedToken !== expectedToken) {
+    console.error(
+      "Falha na autenticação do webhook Asaas.",
+      "Token recebido:", receivedToken,
+      "Token esperado:", expectedToken
+    );
     return res.status(401).send('Acesso não autorizado.');
   }
 
