@@ -1,5 +1,4 @@
-const { Subscription } = require('../models/subscription');
-const { Payment } = require('../models/payment');
+const { Subscription, Payment } = require('../models');
 
 exports.handleAsaasWebhook = async (req, res) => {
     console.log('Webhook Asaas recebido:', req.body);
