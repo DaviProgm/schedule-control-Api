@@ -1,11 +1,11 @@
 require('dotenv').config();
 
 function asaasAuth(req, res, next) {
-  const receivedToken =
-    req.headers['asaas-access-token'] ||
-    req.headers['access_token'];
-
-  let expectedToken = (process.env.ASAAS_WEBHOOK_TOKEN || '').trim().replace(/^"|"$/g, '');
+  const receivedToken = req.headers['asaas-access-token'];
+  
+  // Limpa o token esperado: remove espaços e aspas
+  let expectedToken = process.env.ASAAS_WEBHOOK_TOKEN || '';
+  expectedToken = expectedToken.trim().replace(/^"|"$/g, '');
 
   if (!receivedToken || receivedToken !== expectedToken) {
     console.error(
