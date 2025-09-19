@@ -14,6 +14,7 @@ const ClientRouter = require('./src/routes/clients');
 const SubscriptionRouter = require('./src/routes/subscription');
 const WebhookRouter = require('./src/routes/webhook');
 const SupportTicketRouter = require('./src/routes/supportTicket');
+const ReportsRouter = require('./src/routes/reports');
 const authMiddleware = require('./src/middleware/auth');
 const checkActiveSubscription = require('./src/middleware/subscription');
 require("./src/cron/sendUpcomingNotifications");
@@ -36,6 +37,7 @@ app.use(SubscriptionRouter);
 app.use(WebhookRouter);
 app.use(notificationRoutes);
 app.use('/support-tickets', authMiddleware, SupportTicketRouter);
+app.use('/reports', authMiddleware, checkActiveSubscription, ReportsRouter);
 
 sequelize.sync({ alter: true }).then(() => {
   console.log('Banco de dados sincronizado');

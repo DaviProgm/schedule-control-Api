@@ -1,6 +1,4 @@
 const { SupportTicket, User } = require('../models');
-const sgMail = require('@sendgrid/mail');
-sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 async function createSupportTicket(req, res) {
   try {
@@ -19,25 +17,14 @@ async function createSupportTicket(req, res) {
 
     const user = await User.findByPk(userId);
 
-    // Send email notification with SendGrid
-    const msg = {
-      to: 'workgate.oficial@gmail.com', // Change to your recipient
-      from: process.env.SENDGRID_FROM_EMAIL, // Change to your verified sender
-      subject: `Novo Chamado de Suporte: ${subject}`,
-      html: `
-        <h1>Novo Chamado de Suporte Recebido</h1>
-        <p><b>De:</b> ${user.name} (${user.email})</p>
-        <p><b>Assunto:</b> ${subject}</p>
-        <hr>
-        <p><b>Mensagem:</b></p>
-        <p>${message}</p>
-      `,
-    };
-
-    await sgMail.send(msg);
+    // Construct WhatsApp URL
+    const whatsappNumber = '85921688734';
+    const whatsappMessage = `Assunto: ${subject}\n\nMensagem: ${message}`;
+    const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(whatsappMessage)}`;
 
     return res.status(201).json({
-      message: 'Chamado de suporte criado com sucesso!',
+      message: 'Chamado de suporte criado com sucesso! Redirecionando para o WhatsApp.',
+      whatsappUrl,
       ticket,
     });
   } catch (error) {
