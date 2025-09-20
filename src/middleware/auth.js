@@ -10,7 +10,7 @@ async function authMiddleware(req, res, next) {
       return res.status(401).json({ message: 'Token não informado' });
     }
 
-    // Header tem o formato: "Bearer token"
+    // Header tem o formato: "Bearer token" 
     const token = authHeader.split(' ')[1];
     if (!token) {
       return res.status(401).json({ message: 'Token inválido' });

@@ -3,7 +3,7 @@ const { Op } = require('sequelize');
 const moment = require('moment');
 const Schedule = require('../models/schedule');
 const Client = require('../models/clients');
-const { sendEmail } = require('../services/sendWhatsapp'); // File name is the same, but logic is now email
+const { sendEmail } = require('../services/sendWhatsapp');
 
 // Roda no início de cada hora (minuto 0)
 cron.schedule('0 * * * *', async () => {
@@ -45,10 +45,46 @@ cron.schedule('0 * * * *', async () => {
 
         const subject = `Lembrete de Agendamento: ${schedule.service}`;
         const htmlBody = `
-            <h1>Lembrete de Agendamento</h1>
-            <p>Olá, ${client.name}.</p>
-            <p>Este é um lembrete para o seu agendamento de <strong>${schedule.service}</strong>, que acontecerá hoje, dia <strong>${formattedDate}</strong> às <strong>${formattedTime}</strong>.</p>
-            <p>Até breve!</p>
+        <body style="font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f4f4f4;">
+            <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                <tr>
+                    <td align="center" style="padding: 20px 0;">
+                        <table width="600" border="0" cellspacing="0" cellpadding="0" style="background-color: #ffffff; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); overflow: hidden;">
+                            <tr>
+                                <td align="center" style="padding: 40px 20px; background-color: #F5A623; color: #ffffff;">
+                                    <h1 style="margin: 0; font-size: 24px;">Lembrete de Agendamento</h1>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 40px 30px; color: #333333;">
+                                    <p style="font-size: 16px; margin: 0 0 20px;">Olá, ${client.name},</p>
+                                    <p style="font-size: 16px; line-height: 1.5;">
+                                        Este é um lembrete para o seu agendamento de <strong>${schedule.service}</strong> que acontecerá em breve.
+                                    </p>
+                                    <table width="100%" border="0" cellspacing="0" cellpadding="0" style="margin: 30px 0;">
+                                        <tr>
+                                            <td align="center" style="padding: 20px; background-color: #f9f9f9; border-radius: 5px;">
+                                                <p style="font-size: 18px; margin: 0; color: #333333;">
+                                                    <strong>Data:</strong> ${formattedDate}<br>
+                                                    <strong>Hora:</strong> ${formattedTime}
+                                                </p>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                    <p style="font-size: 16px;">Estamos te esperando!</p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td align="center" style="padding: 20px; font-size: 12px; color: #888888; background-color: #f4f4f4;">
+                                    <p style="margin: 0;">Este é um e-mail automático, por favor não responda.</p>
+                                    <p style="margin: 5px 0 0;">© 2025 Seu Sistema de Agendamentos</p>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+        </body>
         `;
 
         await sendEmail(
