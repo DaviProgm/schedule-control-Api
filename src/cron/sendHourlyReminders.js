@@ -51,8 +51,9 @@ cron.schedule('0 * * * *', async () => {
                     <td align="center" style="padding: 20px 0;">
                         <table width="600" border="0" cellspacing="0" cellpadding="0" style="background-color: #ffffff; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); overflow: hidden;">
                             <tr>
-                                <td align="center" style="padding: 40px 20px; background-color: #F5A623; color: #ffffff;">
-                                    <h1 style="margin: 0; font-size: 24px;">Lembrete de Agendamento</h1>
+                                <td align="center" style="padding: 30px 20px; background-color: #0b0b0d; color: #ffffff;">
+                                    <img src="https://i.ibb.co/svh74hCH/Whats-App-Image-2025-09-18-at-01-23-19-removebg-preview.png" alt="Workgate Logo" width="180" style="display: block; margin-bottom: 20px;"/>
+                                    <h1 style="margin: 0; font-size: 24px; color: #ffffff;">Lembrete de Agendamento</h1>
                                 </td>
                             </tr>
                             <tr>
@@ -63,10 +64,10 @@ cron.schedule('0 * * * *', async () => {
                                     </p>
                                     <table width="100%" border="0" cellspacing="0" cellpadding="0" style="margin: 30px 0;">
                                         <tr>
-                                            <td align="center" style="padding: 20px; background-color: #f9f9f9; border-radius: 5px;">
+                                            <td align="center" style="padding: 20px; background-color: #f9f9f9; border: 1px solid #eeeeee; border-radius: 5px;">
                                                 <p style="font-size: 18px; margin: 0; color: #333333;">
-                                                    <strong>Data:</strong> ${formattedDate}<br>
-                                                    <strong>Hora:</strong> ${formattedTime}
+                                                    <strong style="color: #6b0082;">Data:</strong> ${formattedDate}<br>
+                                                    <strong style="color: #6b0082;">Hora:</strong> ${formattedTime}
                                                 </p>
                                             </td>
                                         </tr>
@@ -77,7 +78,7 @@ cron.schedule('0 * * * *', async () => {
                             <tr>
                                 <td align="center" style="padding: 20px; font-size: 12px; color: #888888; background-color: #f4f4f4;">
                                     <p style="margin: 0;">Este é um e-mail automático, por favor não responda.</p>
-                                    <p style="margin: 5px 0 0;">© 2025 Seu Sistema de Agendamentos</p>
+                                    <p style="margin: 5px 0 0;">© 2025 Workgate</p>
                                 </td>
                             </tr>
                         </table>
