@@ -1,16 +1,13 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
 const User = require('./users');
-
+const Client = require('./clients');
+const Service = require('./service');
 
 const Schedule = sequelize.define('Schedule', {
   name: {
     type: DataTypes.STRING,
     allowNull: true,
-  },
-  service: {
-    type: DataTypes.STRING,
-    allowNull: false,
   },
   date: {
     type: DataTypes.DATEONLY,
@@ -39,20 +36,35 @@ const Schedule = sequelize.define('Schedule', {
   },
   clientId: {
     type: DataTypes.INTEGER,
-    allowNull: true,  // aceita null temporariamente
+    allowNull: true,
     references: {
       model: 'clients',
       key: 'id',
     }
-  }
   },
+  serviceId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+          model: 'services',
+          key: 'id'
+      }
+  }
+},
 {
     tableName: 'schedules',
     freezeTableName: true,
     timestamps: true,
   });
 
-Schedule.belongsTo(User, { foreignKey: 'userId' });
-User.hasMany(Schedule, { foreignKey: 'userId' });
+// Associations
+Schedule.belongsTo(User, { foreignKey: 'userId', as: 'user' });
+User.hasMany(Schedule, { foreignKey: 'userId', as: 'schedules' });
+
+Schedule.belongsTo(Client, { foreignKey: 'clientId', as: 'client' });
+Client.hasMany(Schedule, { foreignKey: 'clientId', as: 'schedules' });
+
+Schedule.belongsTo(Service, { foreignKey: 'serviceId', as: 'service' });
+Service.hasMany(Schedule, { foreignKey: 'serviceId', as: 'schedules' });
 
 module.exports = Schedule;
