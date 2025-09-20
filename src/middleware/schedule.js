@@ -1,11 +1,11 @@
 const Schedule = require('../models/schedule');
 
 async function ValidadeCreateSchedule(req, res, next) {
-  const { name, service, date, time } = req.body;
+  const { clientId, serviceId, date, time } = req.body;
 
-  if (!service || !date || !time) {
+  if (!clientId || !serviceId || !date || !time) {
     return res.status(400).send({
-      message: "Os campos  service, date e time são obrigatórios."
+      message: "Os campos clientId, serviceId, date e time são obrigatórios."
     });
   }
 
