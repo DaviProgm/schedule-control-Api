@@ -54,7 +54,7 @@ async function sendDailyScheduleEmail(userId) {
                     <table width="600" border="0" cellspacing="0" cellpadding="0" style="background-color: #ffffff; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); overflow: hidden;">
                         <tr>
                             <td align="center" style="padding: 30px 20px; background-color: #0b0b0d; color: #ffffff;">
-                                <img src="https://i.ibb.co/svh74hCH/Whats-App-Image-2025-09-18-at-01-23-19-removebg-preview.png" alt="Workgate Logo" width="180" style="display: block; margin-bottom: 20px;"/>
+                                <img src="https://i.ibb.co/CpRdNxXP/Design-sem-nome-3.png" alt="Workgate Logo" width="180" style="display: block; margin-bottom: 20px;"/>
                                 <h1 style="margin: 0; font-size: 24px; color: #ffffff;">Sua Agenda de Hoje</h1>
                             </td>
                         </tr>
