@@ -38,7 +38,7 @@ async function CreateSchedule(req, res) {
                                 <tr>
                                     <td align="center" style="padding: 30px 20px; background-color: #0000; color: #ffffff;">
                                         <img src="https://i.ibb.co/svh74hCH/Whats-App-Image-2025-09-18-at-01-23-19-removebg-preview.png" alt="Workgate Logo" width="180" style="display: block; margin-bottom: 20px;"/>
-                                        <h1 style="margin: 0; font-size: 24px; color: #ffffff;">Agendamento Confirmado!</h1>
+                                        <h1 style="margin: 0; font-size: 24px; color: #ffff;">Agendamento Confirmado!</h1>
                                     </td>
                                 </tr>
                                 <tr>
