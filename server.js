@@ -18,6 +18,7 @@ const ReportsRouter = require('./src/routes/reports');
 const authMiddleware = require('./src/middleware/auth');
 const checkActiveSubscription = require('./src/middleware/subscription');
 require("./src/cron/sendUpcomingNotifications");
+require("./src/cron/sendHourlyReminders");
 
 app.use(cors({
   origin: '*'

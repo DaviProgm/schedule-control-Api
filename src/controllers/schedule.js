@@ -1,4 +1,6 @@
-const { Schedule, Client, User } = require('../models');  
+const { Schedule, Client, User } = require('../models');
+const { sendSms } = require('../services/sendWhatsapp');
+const moment = require('moment');
 
 async function CreateSchedule(req, res) {
     try {
@@ -22,6 +24,17 @@ async function CreateSchedule(req, res) {
             observations,
             userId: req.user.id,
         });
+
+        // Envia SMS de confirmação
+        if (client.phone) {
+            const formattedDate = moment(date).format('DD/MM/YYYY');
+            const messageBody = `Seu agendamento de ${service} para o dia ${formattedDate} às ${time} foi confirmado.`;
+
+            // Envia o SMS sem bloquear a resposta da API
+            sendSms(client.phone, messageBody).catch(err => {
+                console.error("Error sending confirmation SMS:", err);
+            });
+        }
 
         return res.status(201).json({
             message: 'Agendamento criado com sucesso!',
