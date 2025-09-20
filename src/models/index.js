@@ -7,6 +7,7 @@ const Schedule = require('./schedule');
 const Subscription = require('./subscription');
 const Payment = require('./payment');
 const SupportTicket = require('./supportTicket');
+const Service = require('./service');
 
 const db = {
   Sequelize, // Add this line
@@ -17,6 +18,7 @@ const db = {
   Subscription,
   Payment,
   SupportTicket,
+  Service,
 };
 
 // This is a placeholder for running associations if they were defined in a separate method
