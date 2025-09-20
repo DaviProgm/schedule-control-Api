@@ -44,7 +44,7 @@ const Schedule = sequelize.define('Schedule', {
   },
   serviceId: {
       type: DataTypes.INTEGER,
-      allowNull: true, // Temporarily allow nulls to fix existing data
+      allowNull: false,
       references: {
           model: 'services',
           key: 'id'

@@ -20,13 +20,14 @@ cron.schedule("* * * * *", async () => {
       include: [
         {
           model: db.User,
+          as: 'user',
           attributes: ["notificationToken"],
         },
       ],
     });
 
     for (const schedule of schedules) {
-      const token = schedule.User?.notificationToken;
+      const token = schedule.user?.notificationToken;
 
       if (token) {
         await sendPushNotification(token, {
