@@ -15,6 +15,9 @@ const Service = sequelize.define('Service', {
     type: DataTypes.DECIMAL(10, 2),
     allowNull: false,
   },
+}, {
+  tableName: 'services',
+  freezeTableName: true // To prevent Sequelize from trying to pluralize it further
 });
 
 // A Service belongs to a User

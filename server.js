@@ -43,10 +43,30 @@ app.use('/support-tickets', authMiddleware, SupportTicketRouter);
 app.use('/reports', authMiddleware, checkActiveSubscription, ReportsRouter);
 app.use('/services', ServiceRouter);
 
-sequelize.sync({ alter: true }).then(() => {
-  console.log('Banco de dados sincronizado');
-});
+const startServer = async () => {
+  try {
+    const { Service, Schedule } = require('./src/models');
+    console.log('Iniciando sincronização ordenada do banco de dados...');
 
-app.listen(port, () => {
-  console.log(`Servidor rodando na porta ${port}`);
-});
+    // Garante que a tabela Service exista primeiro
+    await Service.sync({ alter: true });
+    console.log('Tabela de Serviços sincronizada.');
+
+    // Agora sincroniza a tabela Schedule, que depende da de Serviços
+    await Schedule.sync({ alter: true });
+    console.log('Tabela de Agendamentos sincronizada.');
+
+    // Roda uma sincronização final para garantir que o resto esteja ok
+    await sequelize.sync({ alter: true });
+    console.log('Sincronização final do banco de dados concluída.');
+
+    app.listen(port, () => {
+      console.log(`Servidor rodando na porta ${port}`);
+    });
+
+  } catch (error) {
+    console.error('Falha ao sincronizar o banco de dados ou iniciar o servidor:', error);
+  }
+};
+
+startServer();
