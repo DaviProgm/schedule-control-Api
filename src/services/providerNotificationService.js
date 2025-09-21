@@ -1,6 +1,6 @@
 const { User, Schedule, Client, Service } = require('../models');
 const { sendEmail } = require('./sendWhatsapp'); // This file now sends emails
-const moment = require('moment');
+const moment = require('moment-timezone');
 
 /**
  * Fetches all schedules for a given user for the current day and sends a summary email.
@@ -14,7 +14,9 @@ async function sendDailyScheduleEmail(userId) {
       return;
     }
 
-    const today = moment().format('YYYY-MM-DD');
+    const timezone = "America/Sao_Paulo";
+    const today = moment.tz(timezone).format('YYYY-MM-DD');
+
     const schedules = await Schedule.findAll({
       where: {
         userId: userId,
@@ -62,7 +64,7 @@ async function sendDailyScheduleEmail(userId) {
                             <td style="padding: 40px 30px; color: #333333;">
                                 <p style="font-size: 16px; margin: 0 0 20px;">Olá, ${user.name},</p>
                                 <p style="font-size: 16px; line-height: 1.5;">
-                                    Aqui está um resumo dos seus compromissos para hoje, ${moment().format('DD/MM/YYYY')}:
+                                    Aqui está um resumo dos seus compromissos para hoje, ${moment.tz(timezone).format('DD/MM/YYYY')}:
                                 </p>
                                 <div style="margin: 30px 0; border: 1px solid #eeeeee; border-radius: 5px; overflow: hidden;">
                                     ${scheduleHtml}

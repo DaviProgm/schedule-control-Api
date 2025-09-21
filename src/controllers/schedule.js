@@ -39,6 +39,7 @@ async function CreateSchedule(req, res) {
 
         // Envia Email de confirmação para o cliente
         if (client.email) {
+            const user = await User.findByPk(req.user.id);
             const formattedDate = moment(date).format('DD/MM/YYYY');
             const subject = `Confirmação de Agendamento: ${service.name}`;
             const htmlBody = `
@@ -57,7 +58,7 @@ async function CreateSchedule(req, res) {
                                     <td style="padding: 40px 30px; color: #333333;">
                                         <p style="font-size: 16px; margin: 0 0 20px;">Olá, ${client.name},</p>
                                         <p style="font-size: 16px; line-height: 1.5;">
-                                            Seu agendamento para o serviço de <strong>${service.name}</strong> foi confirmado com sucesso.
+                                            Seu agendamento para o serviço de <strong>${service.name}</strong> com <strong>${user.name}</strong> foi confirmado com sucesso.
                                         </p>
                                         <table width="100%" border="0" cellspacing="0" cellpadding="0" style="margin: 30px 0;">
                                             <tr>

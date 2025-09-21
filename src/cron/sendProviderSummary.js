@@ -4,7 +4,7 @@ const { sendDailyScheduleEmail } = require('../services/providerNotificationServ
 
 // Roda todo dia às 8:00 da manhã
 cron.schedule('0 8 * * *', async () => {
-  console.log('Running daily job: Send Provider Summaries');
+  console.log('Running daily job: Send Provider Summaries in Sao Paulo timezone');
 
   try {
     const users = await User.findAll();
@@ -23,4 +23,6 @@ cron.schedule('0 8 * * *', async () => {
   } catch (error) {
     console.error('Error running Send Provider Summaries cron job:', error);
   }
+}, {
+  timezone: "America/Sao_Paulo"
 });

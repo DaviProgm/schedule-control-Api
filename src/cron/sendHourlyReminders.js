@@ -1,21 +1,22 @@
 const cron = require('node-cron');
 const { Op } = require('sequelize');
-const moment = require('moment');
-const Schedule = require('../models/schedule');
-const Client = require('../models/clients');
+const moment = require('moment-timezone');
+const { Schedule, Client, Service } = require('../models');
 const { sendEmail } = require('../services/sendWhatsapp');
 
-// Roda no início de cada hora (minuto 0)
+// Roda no início de cada hora (minuto 0), no fuso horário de São Paulo
 cron.schedule('0 * * * *', async () => {
-  console.log('Running cron job: sendHourlyReminders (Email)');
+  const timezone = "America/Sao_Paulo";
+  console.log(`Running cron job: sendHourlyReminders (Email) for timezone ${timezone}`);
 
-  const now = moment();
-  const oneHourFromNow = moment().add(1, 'hour');
+  const now = moment.tz(timezone);
+  const oneHourFromNow = now.clone().add(1, 'hour');
 
   try {
+    // Find schedules for today, within the next hour
     const schedules = await Schedule.findAll({
       where: {
-        date: now.format('YYYY-MM-DD'), // Agendamentos para hoje
+        date: now.format('YYYY-MM-DD'),
         time: {
           [Op.between]: [now.format('HH:mm:ss'), oneHourFromNow.format('HH:mm:ss')],
         },
@@ -26,6 +27,11 @@ cron.schedule('0 * * * *', async () => {
           as: 'client',
           required: true,
         },
+        {
+          model: Service,
+          as: 'service',
+          required: true,
+        }
       ],
     });
 
@@ -43,7 +49,7 @@ cron.schedule('0 * * * *', async () => {
         const formattedDate = moment(schedule.date).format('DD/MM/YYYY');
         const formattedTime = schedule.time;
 
-        const subject = `Lembrete de Agendamento: ${schedule.service}`;
+        const subject = `Lembrete de Agendamento: ${schedule.service.name}`;
         const htmlBody = `
         <body style="font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f4f4f4;">
             <table width="100%" border="0" cellspacing="0" cellpadding="0">
@@ -60,7 +66,7 @@ cron.schedule('0 * * * *', async () => {
                                 <td style="padding: 40px 30px; color: #333333;">
                                     <p style="font-size: 16px; margin: 0 0 20px;">Olá, ${client.name},</p>
                                     <p style="font-size: 16px; line-height: 1.5;">
-                                        Este é um lembrete para o seu agendamento de <strong>${schedule.service}</strong> que acontecerá em breve.
+                                        Este é um lembrete para o seu agendamento de <strong>${schedule.service.name}</strong> que acontecerá em breve.
                                     </p>
                                     <table width="100%" border="0" cellspacing="0" cellpadding="0" style="margin: 30px 0;">
                                         <tr>
@@ -98,4 +104,6 @@ cron.schedule('0 * * * *', async () => {
   } catch (error) {
     console.error('Error running sendHourlyReminders (Email) cron job:', error);
   }
+}, {
+  timezone: "America/Sao_Paulo"
 });
