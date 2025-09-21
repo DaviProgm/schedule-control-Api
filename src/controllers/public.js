@@ -23,7 +23,11 @@ const getAvailability = async (req, res) => {
     // --- 3. Fetch Data in Parallel -- -
     const [service, existingSchedules] = await Promise.all([
       Service.findOne({ where: { id: serviceId, userId: providerId } }),
-      Schedule.findAll({ where: { userId: providerId, date } })
+      // Include the service in the schedule to get the duration of each existing appointment
+      Schedule.findAll({ 
+        where: { userId: providerId, date },
+        include: { model: Service, as: 'service', attributes: ['duration'] }
+      })
     ]);
 
     if (!service) {
@@ -49,8 +53,6 @@ const getAvailability = async (req, res) => {
     }
 
     // --- 5. Filter Out Booked and Conflicting Slots ---
-    const bookedTimes = existingSchedules.map(schedule => moment(schedule.time, 'HH:mm:ss'));
-
     const availableSlots = potentialSlots.filter(slot => {
       const slotTime = moment(slot, 'HH:mm');
       
@@ -58,10 +60,14 @@ const getAvailability = async (req, res) => {
         return false;
       }
 
-      for (const bookedTime of bookedTimes) {
-        const bookedEndTime = moment(bookedTime).add(serviceDuration, 'minutes');
-        if (slotTime.isBetween(bookedTime, bookedEndTime, undefined, '[)')) {
-          return false;
+      // Check for conflicts with existing appointments
+      for (const bookedSchedule of existingSchedules) {
+        const bookedStartTime = moment(bookedSchedule.time, 'HH:mm:ss');
+        // BUG FIX: Use the duration of the *booked* service, not the new one
+        const bookedEndTime = moment(bookedStartTime).add(bookedSchedule.service.duration, 'minutes'); 
+        
+        if (slotTime.isBetween(bookedStartTime, bookedEndTime, undefined, '[)')) {
+          return false; // Slot starts during another appointment
         }
       }
       return true;
