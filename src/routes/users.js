@@ -26,4 +26,10 @@ router.get('/profile',
   UserController.getProfile
 );
 
+// Route to set default work hours for a specific user
+router.post('/:userId/set-default-work-hours',
+  authMiddleware,
+  UserController.setDefaultWorkHours
+);
+
 module.exports = router;

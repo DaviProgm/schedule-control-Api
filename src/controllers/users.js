@@ -159,9 +159,50 @@ async function getProfile(req, res) {
     }
 }
 
+async function setDefaultWorkHours(req, res) {
+    try {
+        const { userId } = req.params; // User ID from URL parameter
+        const requestingUserId = req.user.id; // ID of the user making the request
+
+        // Optional: Add authorization check here if only admins or the user themselves can set default hours
+        // For now, assuming the requesting user is authorized to do this for the userId in params
+        if (parseInt(userId) !== requestingUserId && req.user.role !== 'admin') {
+            return res.status(403).json({ message: "Acesso negado. Você não tem permissão para definir horários para este usuário." });
+        }
+
+        const user = await User.findByPk(userId);
+        if (!user) {
+            return res.status(404).json({ message: "Usuário não encontrado." });
+        }
+
+        // Define the default work hours
+        const defaultWorkHours = [
+            { dayOfWeek: 0, startTime: "00:00", endTime: "00:00", isAvailable: false, userId: user.id }, // Sunday
+            { dayOfWeek: 1, startTime: "07:00", endTime: "19:00", isAvailable: true, userId: user.id },  // Monday
+            { dayOfWeek: 2, startTime: "07:00", endTime: "19:00", isAvailable: true, userId: user.id },  // Tuesday
+            { dayOfWeek: 3, startTime: "07:00", endTime: "19:00", isAvailable: true, userId: user.id },  // Wednesday
+            { dayOfWeek: 4, startTime: "07:00", "endTime": "19:00", isAvailable: true, userId: user.id },  // Thursday
+            { dayOfWeek: 5, startTime: "07:00", "endTime": "19:00", isAvailable: true, userId: user.id },  // Friday
+            { dayOfWeek: 6, startTime: "00:00", "endTime": "00:00", isAvailable: false, userId: user.id }   // Saturday
+        ];
+
+        // Delete existing work hours for this user
+        await WorkHour.destroy({ where: { userId: user.id } });
+
+        // Bulk create the new default work hours
+        await WorkHour.bulkCreate(defaultWorkHours);
+
+        return res.status(200).json({ message: `Horários padrão definidos para o usuário ${user.username}.` });
+    } catch (error) {
+        console.error("Erro ao definir horários padrão:", error);
+        return res.status(500).json({ message: "Erro ao definir horários padrão.", error: error.message });
+    }
+}
+
 module.exports = {
     CreateUser,
     GetUsers,
     updateProfile,
-    getProfile
+    getProfile,
+    setDefaultWorkHours
 };
