@@ -19,6 +19,11 @@ const User = sequelize.define('User', {
       isEmail: true,
     }
   },
+  username: {
+    type: DataTypes.STRING,
+    allowNull: true, // Will be set automatically after creation
+    unique: true,
+  },
   password: {
     type: DataTypes.STRING,
     allowNull: false,
@@ -42,6 +47,14 @@ const User = sequelize.define('User', {
   },
   passwordResetExpires: {
     type: DataTypes.DATE,
+    allowNull: true,
+  },
+  profilePictureUrl: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  bio: {
+    type: DataTypes.TEXT,
     allowNull: true,
   }
 }, {

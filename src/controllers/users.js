@@ -3,6 +3,34 @@ const axios = require('axios');
 const bcrypt = require('bcrypt');
 const { User } = require('../models');
 
+// Helper function to convert a string to a URL-friendly slug
+const slugify = (text) => {
+  return text
+    .toString()
+    .toLowerCase()
+    .normalize('NFD') // split an accented letter in the base letter and the acent
+    .replace(/[\u0300-\u036f]/g, '') // remove all previously split accents
+    .replace(/\s+/g, '-') // Replace spaces with -
+    .replace(/[^\w\-]+/g, '') // Remove all non-word chars
+    .replace(/\-\-+/g, '-') // Replace multiple - with single -
+    .replace(/^-+/, '') // Trim - from start of text
+    .replace(/-+$/, ''); // Trim - from end of text
+};
+
+// Helper function to generate a unique username
+const generateUniqueUsername = async (name) => {
+  let baseUsername = slugify(name);
+  let username = baseUsername;
+  let counter = 1;
+  
+  // Check if username already exists
+  while (await User.findOne({ where: { username } })) {
+    username = `${baseUsername}-${counter}`;
+    counter++;
+  }
+  return username;
+};
+
 async function CreateUser(req, res) {
     try {
         const { name, email, password, role, cpfCnpj } = req.body;
@@ -28,8 +56,11 @@ async function CreateUser(req, res) {
 
         const asaasCustomerId = asaasResponse.data.id;
 
-        // Update user with asaasCustomerId
-        await user.update({ asaasCustomerId });
+        // Generate a unique username
+        const username = await generateUniqueUsername(name);
+
+        // Update user with asaasCustomerId and username
+        await user.update({ asaasCustomerId, username });
 
         await user.reload(); // Recarrega os dados do usuário do banco
 
@@ -61,7 +92,45 @@ async function GetUsers(req, res) {
     }
 }
 
+async function updateProfile(req, res) {
+    try {
+        const { bio, profilePictureUrl, username } = req.body;
+        const userId = req.user.id;
+
+        const user = await User.findByPk(userId);
+
+        if (!user) {
+            return res.status(404).json({ message: "Usuário não encontrado." });
+        }
+
+        const updateData = {
+            bio: bio !== undefined ? bio : user.bio,
+            profilePictureUrl: profilePictureUrl !== undefined ? profilePictureUrl : user.profilePictureUrl,
+        };
+
+        // Handle username update
+        if (username) {
+            const newUsername = slugify(username);
+            if (newUsername !== user.username) {
+                const existingUser = await User.findOne({ where: { username: newUsername } });
+                if (existingUser) {
+                    return res.status(409).json({ message: "Este nome de usuário já está em uso. Por favor, escolha outro." });
+                }
+                updateData.username = newUsername;
+            }
+        }
+
+        await user.update(updateData);
+
+        return res.status(200).json(user);
+    } catch (error) {
+        console.error("Erro ao atualizar perfil", error);
+        return res.status(500).json({ message: "Erro ao atualizar perfil.", error: error.message });
+    }
+}
+
 module.exports = {
     CreateUser,
-    GetUsers
+    GetUsers,
+    updateProfile
 };
