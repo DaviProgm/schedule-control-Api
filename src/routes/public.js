@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const publicController = require('../controllers/public.js');
-
+ console.log('PublicRouter loaded and running!');
 // Route to get a provider's public profile (services, work hours, etc.)
 router.get('/provider/:username', publicController.getPublicProfile);
 

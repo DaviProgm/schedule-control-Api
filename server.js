@@ -34,7 +34,10 @@ app.use((req, res, next) => {
   next();
 });
 //
+
 app.use('/users', UserRouter);
+app.use('/public', PublicRouter);
+
 app.use('/auth', AuthRouter)
 app.use('/agendamentos', authMiddleware, checkActiveSubscription, scheduleRoutes);
 app.use(ClientRouter);
@@ -45,7 +48,6 @@ app.use('/support-tickets', authMiddleware, SupportTicketRouter);
 app.use('/reports', authMiddleware, checkActiveSubscription, ReportsRouter);
 app.use('/services', ServiceRouter);
 app.use('/work-hours', WorkHourRouter);
-app.use('/public', PublicRouter);
 
 sequelize.sync({ alter: true }).then(() => {
   console.log('Banco de dados sincronizado');

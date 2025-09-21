@@ -4,6 +4,7 @@ const { User } = require('../models');
 require('dotenv').config();
 
 async function authMiddleware(req, res, next) {
+  console.log(`Auth Middleware: ${req.method} ${req.url}`); // Added for debugging
   try {
     const authHeader = req.headers.authorization;
     if (!authHeader) {
