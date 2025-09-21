@@ -20,4 +20,10 @@ router.put('/profile',
   UserController.updateProfile
 );
 
+// Route to get the user's own profile
+router.get('/profile',
+  authMiddleware,
+  UserController.getProfile
+);
+
 module.exports = router;

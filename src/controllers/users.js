@@ -128,8 +128,27 @@ async function updateProfile(req, res) {
     }
 }
 
+async function getProfile(req, res) {
+    try {
+        const userId = req.user.id;
+        const user = await User.findByPk(userId, {
+            attributes: ['id', 'name', 'email', 'username', 'bio', 'role']
+        });
+
+        if (!user) {
+            return res.status(404).json({ message: "Usuário não encontrado." });
+        }
+
+        return res.status(200).json(user);
+    } catch (error) {
+        console.error("Erro ao buscar perfil", error);
+        return res.status(500).json({ message: "Erro ao buscar perfil.", error: error.message });
+    }
+}
+
 module.exports = {
     CreateUser,
     GetUsers,
-    updateProfile
+    updateProfile,
+    getProfile
 };
