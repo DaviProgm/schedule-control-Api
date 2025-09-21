@@ -49,10 +49,6 @@ const User = sequelize.define('User', {
     type: DataTypes.DATE,
     allowNull: true,
   },
-  profilePictureUrl: {
-    type: DataTypes.STRING,
-    allowNull: true,
-  },
   bio: {
     type: DataTypes.TEXT,
     allowNull: true,
