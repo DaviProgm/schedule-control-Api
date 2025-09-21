@@ -199,8 +199,57 @@ const getPublicProfile = async (req, res) => {
   }
 };
 
+const debugAvailability = async (req, res) => {
+  try {
+    const { username } = req.params;
+    const { date, serviceId } = req.query;
+
+    const provider = await User.findOne({ where: { username } });
+    if (!provider) {
+      return res.status(404).json({ message: 'Debug: Profissional não encontrado.' });
+    }
+    const providerId = provider.id;
+
+    const service = await Service.findOne({ where: { id: serviceId, userId: providerId } });
+    const existingSchedules = await Schedule.findAll({ 
+      where: { userId: providerId, date },
+      include: { model: Service, as: 'service', attributes: ['duration'] }
+    });
+    
+    const dayOfWeek = moment(date).day();
+    const workHour = await WorkHour.findOne({ where: { userId: providerId, dayOfWeek } });
+
+    const debugData = {
+      inputs: { username, date, serviceId },
+      foundProvider: {
+        id: provider.id,
+        name: provider.name,
+        username: provider.username,
+      },
+      foundService: service,
+      foundWorkHourForDay: workHour,
+      foundExistingSchedulesOnDate: existingSchedules,
+      serverTime: {
+        time: moment().format(),
+        timezone: moment.tz.guess(),
+      },
+      parsedDate: {
+        input: date,
+        dayOfWeek: dayOfWeek,
+        momentObject: moment(date).format(),
+      }
+    };
+
+    res.status(200).json(debugData);
+
+  } catch (error) {
+    res.status(500).json({ message: 'Erro no endpoint de debug.', error: error.message });
+  }
+};
+
 module.exports = {
   getAvailability,
   createPublicSchedule,
   getPublicProfile,
+  debugAvailability,
 };

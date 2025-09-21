@@ -11,4 +11,7 @@ router.get('/availability/:username', publicController.getAvailability);
 // Route to create a new schedule from the public page
 router.post('/schedules', publicController.createPublicSchedule);
 
+// Temporary debug route
+router.get('/debug/availability/:username', publicController.debugAvailability);
+
 module.exports = router;
