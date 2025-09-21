@@ -1,7 +1,7 @@
 require("dotenv").config();
 const axios = require('axios');
 const bcrypt = require('bcrypt');
-const { User } = require('../models');
+const { User, WorkHour } = require('../models');
 
 // Helper function to convert a string to a URL-friendly slug
 const slugify = (text) => {
@@ -61,6 +61,19 @@ async function CreateUser(req, res) {
 
         // Update user with asaasCustomerId and username
         await user.update({ asaasCustomerId, username });
+
+        // --- Add default work hours for the new user ---
+        const defaultWorkHours = [
+            { dayOfWeek: 0, startTime: "00:00", endTime: "00:00", isAvailable: false, userId: user.id }, // Sunday
+            { dayOfWeek: 1, startTime: "07:00", endTime: "19:00", isAvailable: true, userId: user.id },  // Monday
+            { dayOfWeek: 2, startTime: "07:00", endTime: "19:00", isAvailable: true, userId: user.id },  // Tuesday
+            { dayOfWeek: 3, startTime: "07:00", endTime: "19:00", isAvailable: true, userId: user.id },  // Wednesday
+            { dayOfWeek: 4, startTime: "07:00", "endTime": "19:00", isAvailable: true, userId: user.id },  // Thursday
+            { dayOfWeek: 5, startTime: "07:00", "endTime": "19:00", isAvailable: true, userId: user.id },  // Friday
+            { dayOfWeek: 6, startTime: "00:00", "endTime": "00:00", isAvailable: false, userId: user.id }   // Saturday
+        ];
+        await WorkHour.bulkCreate(defaultWorkHours);
+        // --- End default work hours ---
 
         await user.reload(); // Recarrega os dados do usuário do banco
 
