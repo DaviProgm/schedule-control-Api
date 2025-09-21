@@ -160,7 +160,41 @@ const createPublicSchedule = async (req, res) => {
   }
 };
 
+const getPublicProfile = async (req, res) => {
+  try {
+    const { username } = req.params;
+
+    const provider = await User.findOne({
+      where: { username },
+      attributes: ['id', 'name', 'username', 'bio'], // Public user info
+      include: [
+        {
+          model: Service,
+          as: 'services',
+          attributes: ['id', 'name', 'duration', 'price'] // Public service info
+        },
+        {
+          model: WorkHour,
+          as: 'workHours',
+          attributes: ['dayOfWeek', 'startTime', 'endTime', 'isAvailable']
+        }
+      ]
+    });
+
+    if (!provider) {
+      return res.status(404).json({ message: 'Profissional não encontrado.' });
+    }
+
+    res.status(200).json(provider);
+
+  } catch (error) {
+    console.error("Error fetching public profile:", error);
+    res.status(500).json({ message: 'Erro ao buscar perfil público.' });
+  }
+};
+
 module.exports = {
   getAvailability,
   createPublicSchedule,
+  getPublicProfile,
 };
