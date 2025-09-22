@@ -23,10 +23,16 @@ const checkActiveSubscription = require('./src/middleware/subscription');
 require("./src/cron/sendUpcomingNotifications");
 require("./src/cron/sendHourlyReminders");
 require("./src/cron/sendProviderSummary");
+require("./src/cron/keepAlive.js"); // Adicionado para manter a API acordada na Render
 
 app.use(cors({
   origin: '*'
 }));
+
+// Rota para health check (usada pelo keep-alive)
+app.get('/health', (req, res) => {
+  res.status(200).json({ status: 'ok' });
+});
 
 app.use(express.json());
 app.use((req, res, next) => {
