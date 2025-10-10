@@ -156,7 +156,7 @@ const createPublicSchedule = async (req, res) => {
                             <table width="600" border="0" cellspacing="0" cellpadding="0" style="background-color: #ffffff; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); overflow: hidden;">
                                 <tr>
                                     <td align="center" style="padding: 30px 20px; background-color: #0b0b0d; color: #ffffff;">
-                                        <img src="https://i.ibb.co/CpRdNxXP/Design-sem-nome-3.png" alt="Workgate Logo" width="180" style="display: block; margin-bottom: 20px;"/>
+                                        <img src="https://i.ibb.co/4Zt4PpDZ/Design-sem-nome-3.png" alt="Workgate Logo" width="180" style="display: block; margin-bottom: 20px;"/>
                                         <h1 style="margin: 0; font-size: 24px; color: #ffffff;">Agendamento Confirmado!</h1>
                                     </td>
                                 </tr>
@@ -244,6 +244,26 @@ const getPublicProfile = async (req, res) => {
   }
 };
 
+const getPublicClientProfile = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const client = await Client.findByPk(id, {
+      attributes: ['id', 'name', 'email', 'phone', 'address', 'foto_perfil_url'],
+    });
+
+    if (!client) {
+      return res.status(404).json({ message: 'Cliente não encontrado.' });
+    }
+
+    res.status(200).json(client);
+
+  } catch (error) {
+    console.error("Error fetching public client profile:", error);
+    res.status(500).json({ message: 'Erro ao buscar perfil público do cliente.' });
+  }
+};
+
 const debugAvailability = async (req, res) => {
   try {
     const { username } = req.params;
@@ -296,5 +316,6 @@ module.exports = {
   getAvailability,
   createPublicSchedule,
   getPublicProfile,
+  getPublicClientProfile,
   debugAvailability,
 };

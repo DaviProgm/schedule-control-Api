@@ -22,6 +22,10 @@ const Client = sequelize.define('Client', {
         type: DataTypes.STRING,
         allowNull: true,
     },
+    foto_perfil_url: {
+        type: DataTypes.STRING,
+        allowNull: true,
+    },
     address: {
         type: DataTypes.STRING,
         allowNull: true,

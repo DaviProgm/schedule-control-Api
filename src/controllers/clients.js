@@ -1,5 +1,48 @@
 const { Client } = require('../models');
+const supabase = require('../config/supabase');
 
+async function UploadProfilePicture(req, res) {
+    try {
+        const { id } = req.params;
+        const file = req.file;
+
+        if (!file) {
+            return res.status(400).send({ message: "Nenhum arquivo enviado." });
+        }
+
+        const client = await Client.findByPk(id);
+        if (!client) {
+            return res.status(404).send({ message: "Cliente não encontrado" });
+        }
+
+        const fileName = `profile-pictures/${id}-${Date.now()}`;
+        const { data, error } = await supabase.storage
+            .from('profile-pictures')
+            .upload(fileName, file.buffer, {
+                contentType: file.mimetype,
+                upsert: true,
+            });
+
+        if (error) {
+            throw error;
+        }
+
+        const { data: { publicUrl } } = supabase.storage.from('profile-pictures').getPublicUrl(fileName);
+
+        await client.update({ foto_perfil_url: publicUrl });
+
+        return res.status(200).json({
+            message: 'Foto de perfil atualizada com sucesso!',
+            url: publicUrl,
+        });
+    } catch (error) {
+        console.error("Erro ao fazer upload da foto de perfil", error);
+        return res.status(500).send({
+            message: 'Erro ao fazer upload da foto de perfil',
+            error: error.message,
+        });
+    }
+}
 
 async function CreateClient(req, res) {
     const { name, email, phone, address } = req.body;
@@ -89,5 +132,6 @@ module.exports = {
     CreateClient,
     GetClients,
     UpdateClient,
-    DeleteClient
+    DeleteClient,
+    UploadProfilePicture
 };

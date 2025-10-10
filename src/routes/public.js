@@ -4,6 +4,7 @@ const publicController = require('../controllers/public.js');
  console.log('PublicRouter loaded and running!');
 // Route to get a provider's public profile (services, work hours, etc.)
 router.get('/provider/:username', publicController.getPublicProfile);
+router.get('/client/:id', publicController.getPublicClientProfile);
 
 // Route to get availability for a provider by username
 router.get('/availability/:username', publicController.getAvailability);

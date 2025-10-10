@@ -1,6 +1,6 @@
 const router = require('express').Router();
 const express = require('express');
-
+const multer = require('multer');
 
 const ClientController = require('../controllers/clients');
 const UpdateClient = require('../controllers/clients');
@@ -9,6 +9,8 @@ const {
   validateUpdateClient,
 } = require('../middleware/clients');
 const authMiddleware = require('../middleware/auth');
+
+const upload = multer({ storage: multer.memoryStorage() });
 
 router.use(authMiddleware);
 
@@ -22,5 +24,7 @@ router.put('/clientes/:id',
     ClientController.UpdateClient
 );
 router.delete('/clientes/:id', ClientController.DeleteClient);
+
+router.post('/clientes/:id/foto-perfil', upload.single('profile_picture'), ClientController.UploadProfilePicture);
 
 module.exports = router;
