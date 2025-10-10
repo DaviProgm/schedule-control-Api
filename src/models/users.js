@@ -56,6 +56,11 @@ const User = sequelize.define('User', {
   foto_perfil_url: {
     type: DataTypes.STRING,
     allowNull: true,
+  },
+  cor_perfil: {
+    type: DataTypes.STRING,
+    allowNull: true,
+    defaultValue: '#FFFFFF' // Default to white
   }
 }, {
   tableName: 'users',      

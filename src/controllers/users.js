@@ -108,7 +108,7 @@ async function GetUsers(req, res) {
 
 async function updateProfile(req, res) {
     try {
-        const { bio, username } = req.body; // Removed profilePictureUrl
+        const { bio, username, cor_perfil } = req.body; // Removed profilePictureUrl
         const userId = req.user.id;
 
         const user = await User.findByPk(userId);
@@ -119,6 +119,7 @@ async function updateProfile(req, res) {
 
         const updateData = {
             bio: bio !== undefined ? bio : user.bio,
+            cor_perfil: cor_perfil !== undefined ? cor_perfil : user.cor_perfil,
         };
 
         // Handle username update
@@ -146,7 +147,7 @@ async function getProfile(req, res) {
     try {
         const userId = req.user.id;
         const user = await User.findByPk(userId, {
-            attributes: ['id', 'name', 'email', 'username', 'bio', 'role', 'foto_perfil_url']
+            attributes: ['id', 'name', 'email', 'username', 'bio', 'role', 'foto_perfil_url', 'cor_perfil']
         });
 
         if (!user) {
