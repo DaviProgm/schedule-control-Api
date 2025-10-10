@@ -2,6 +2,7 @@ require("dotenv").config();
 const axios = require('axios');
 const bcrypt = require('bcrypt');
 const { User, WorkHour } = require('../models');
+const supabase = require('../config/supabase');
 
 // Helper function to convert a string to a URL-friendly slug
 const slugify = (text) => {
@@ -145,7 +146,7 @@ async function getProfile(req, res) {
     try {
         const userId = req.user.id;
         const user = await User.findByPk(userId, {
-            attributes: ['id', 'name', 'email', 'username', 'bio', 'role']
+            attributes: ['id', 'name', 'email', 'username', 'bio', 'role', 'foto_perfil_url']
         });
 
         if (!user) {
@@ -156,6 +157,49 @@ async function getProfile(req, res) {
     } catch (error) {
         console.error("Erro ao buscar perfil", error);
         return res.status(500).json({ message: "Erro ao buscar perfil.", error: error.message });
+    }
+}
+
+async function uploadProfilePhoto(req, res) {
+    try {
+        const userId = req.user.id;
+        const file = req.file;
+
+        if (!file) {
+            return res.status(400).send({ message: "Nenhum arquivo enviado." });
+        }
+
+        const user = await User.findByPk(userId);
+        if (!user) {
+            return res.status(404).send({ message: "Usuário não encontrado" });
+        }
+
+        const fileName = `profile-pictures/${userId}-${Date.now()}`;
+        const { data, error } = await supabase.storage
+            .from('profile-pictures')
+            .upload(fileName, file.buffer, {
+                contentType: file.mimetype,
+                upsert: true,
+            });
+
+        if (error) {
+            throw error;
+        }
+
+        const { data: { publicUrl } } = supabase.storage.from('profile-pictures').getPublicUrl(fileName);
+
+        await user.update({ foto_perfil_url: publicUrl });
+
+        return res.status(200).json({
+            message: 'Foto de perfil atualizada com sucesso!',
+            url: publicUrl,
+        });
+    } catch (error) {
+        console.error("Erro ao fazer upload da foto de perfil", error);
+        return res.status(500).send({
+            message: 'Erro ao fazer upload da foto de perfil',
+            error: error.message,
+        });
     }
 }
 
@@ -204,5 +248,6 @@ module.exports = {
     GetUsers,
     updateProfile,
     getProfile,
-    setDefaultWorkHours
+    setDefaultWorkHours,
+    uploadProfilePhoto
 };
