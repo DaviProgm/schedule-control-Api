@@ -217,7 +217,7 @@ const getPublicProfile = async (req, res) => {
 
     const provider = await User.findOne({
       where: { username },
-      attributes: ['id', 'name', 'username', 'bio'], // Public user info
+      attributes: ['id', 'name', 'username', 'bio', 'foto_perfil_url'], // Public user info
       include: [
         {
           model: Service,
