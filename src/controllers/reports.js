@@ -14,6 +14,10 @@ const getWeeklyReport = async (req, res) => {
     const startOfPreviousWeek = today.clone().subtract(1, 'week').startOf('week');
     const endOfPreviousWeek = today.clone().subtract(1, 'week').endOf('week');
 
+    console.log('UserId:', userId);
+    console.log('Start of Current Week:', startOfCurrentWeek.format('YYYY-MM-DD'));
+    console.log('End of Current Week:', endOfCurrentWeek.format('YYYY-MM-DD'));
+
     // 1. New clients
     const newClientsThisWeek = await Client.count({
       where: {
@@ -36,7 +40,7 @@ const getWeeklyReport = async (req, res) => {
     const clientIncrease = newClientsThisWeek - newClientsLastWeek;
 
     // 2. Appointments
-    const completedSchedules = await Schedule.count({
+    const completedSchedulesResult = await Schedule.findAll({
       where: {
         userId,
         status: 'concluído',
@@ -45,8 +49,11 @@ const getWeeklyReport = async (req, res) => {
         },
       },
     });
+    console.log('Completed Schedules Result:', completedSchedulesResult);
+    const completedSchedules = completedSchedulesResult.length;
 
-    const canceledSchedules = await Schedule.count({
+
+    const canceledSchedulesResult = await Schedule.findAll({
       where: {
         userId,
         status: 'cancelado',
@@ -55,6 +62,9 @@ const getWeeklyReport = async (req, res) => {
         },
       },
     });
+    console.log('Canceled Schedules Result:', canceledSchedulesResult);
+    const canceledSchedules = canceledSchedulesResult.length;
+
 
     res.json({
       clientIncrease,
