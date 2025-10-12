@@ -44,9 +44,6 @@ const getWeeklyReport = async (req, res) => {
       where: {
         userId,
         status: 'concluído',
-        date: {
-          [Op.between]: [startOfCurrentWeek.format('YYYY-MM-DD'), endOfCurrentWeek.format('YYYY-MM-DD')],
-        },
       },
     });
     console.log('Completed Schedules Result:', completedSchedulesResult);
@@ -57,9 +54,6 @@ const getWeeklyReport = async (req, res) => {
       where: {
         userId,
         status: 'cancelado',
-        date: {
-          [Op.between]: [startOfCurrentWeek.format('YYYY-MM-DD'), endOfCurrentWeek.format('YYYY-MM-DD')],
-        },
       },
     });
     console.log('Canceled Schedules Result:', canceledSchedulesResult);
