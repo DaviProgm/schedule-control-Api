@@ -39,7 +39,7 @@ const getWeeklyReport = async (req, res) => {
     const completedSchedules = await Schedule.count({
       where: {
         userId,
-        status: 'concluido',
+        status: 'concluído',
         date: {
           [Op.between]: [startOfCurrentWeek.format('YYYY-MM-DD'), endOfCurrentWeek.format('YYYY-MM-DD')],
         },
