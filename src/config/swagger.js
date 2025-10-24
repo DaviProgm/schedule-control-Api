@@ -5,7 +5,7 @@ const swaggerDefinition = {
   info: {
     title: 'API de Agendamento',
     version: '1.0.0',
-    description: 'Documentação da API de Agendamento da Up Soluções',
+    description: 'Documentação da API WORKGATE COMPLETA',
   },
   servers: [
     {
