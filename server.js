@@ -4,6 +4,8 @@ const express = require('express');
 const sequelize = require('./src/config/database');
 const app = express();
 const port = 4005;
+const swaggerUi = require('swagger-ui-express');
+const swaggerSpec = require('./src/config/swagger');
 const cors = require('cors');
 const notificationRoutes = require('./src/routes/notifications');
 
@@ -39,6 +41,8 @@ app.use((req, res, next) => {
   console.log(`REQ: ${req.method} ${req.url}`);
   next();
 });
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 //
 
 app.use('/users', UserRouter);
