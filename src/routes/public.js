@@ -2,12 +2,12 @@ const express = require('express');
 const router = express.Router();
 const publicController = require('../controllers/public.js');
  console.log('PublicRouter loaded and running!');
-// Route to get a provider's public profile (services, work hours, etc.)
+
 /**
  * @swagger
- * /public/provider/{username}:
+ * /public/business/{username}:
  *   get:
- *     summary: Retorna o perfil público de um provedor
+ *     summary: Retorna o perfil público de um negócio (dono, profissionais e unidades)
  *     tags: [Public]
  *     parameters:
  *       - in: path
@@ -15,52 +15,17 @@ const publicController = require('../controllers/public.js');
  *         schema:
  *           type: string
  *         required: true
- *         description: Nome de usuário do provedor
+ *         description: Nome de usuário do dono do negócio
  *     responses:
  *       200:
- *         description: Perfil público do provedor retornado com sucesso
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 id:
- *                   type: string
- *                   example: 123e4567-e89b-12d3-a456-426614174000
- *                 username:
- *                   type: string
- *                   example: provedor_exemplo
- *                 name:
- *                   type: string
- *                   example: Nome do Provedor
- *                 services:
- *                   type: array
- *                   items:
- *                     type: object
- *                     properties:
- *                       id:
- *                         type: string
- *                       name:
- *                         type: string
- *                       price:
- *                         type: number
- *                 workHours:
- *                   type: array
- *                   items:
- *                     type: object
- *                     properties:
- *                       dayOfWeek:
- *                         type: number
- *                       startTime:
- *                         type: string
- *                       endTime:
- *                         type: string
+ *         description: Perfil público do negócio retornado com sucesso
  *       404:
- *         description: Provedor não encontrado
+ *         description: Negócio não encontrado
  *       500:
  *         description: Erro interno do servidor
  */
-router.get('/provider/:username', publicController.getPublicProfile);
+router.get('/business/:username', publicController.getPublicProfile);
+
 /**
  * @swagger
  * /public/client/{id}:
@@ -77,20 +42,6 @@ router.get('/provider/:username', publicController.getPublicProfile);
  *     responses:
  *       200:
  *         description: Perfil público do cliente retornado com sucesso
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 id:
- *                   type: string
- *                   example: 123e4567-e89b-12d3-a456-426614174000
- *                 name:
- *                   type: string
- *                   example: Nome do Cliente
- *                 email:
- *                   type: string
- *                   example: cliente@example.com
  *       404:
  *         description: Cliente não encontrado
  *       500:
@@ -98,12 +49,11 @@ router.get('/provider/:username', publicController.getPublicProfile);
  */
 router.get('/client/:id', publicController.getPublicClientProfile);
 
-// Route to get availability for a provider by username
 /**
  * @swagger
  * /public/availability/{username}:
  *   get:
- *     summary: Retorna a disponibilidade de um provedor por nome de usuário
+ *     summary: Retorna a disponibilidade de um profissional específico de um negócio
  *     tags: [Public]
  *     parameters:
  *       - in: path
@@ -111,7 +61,19 @@ router.get('/client/:id', publicController.getPublicClientProfile);
  *         schema:
  *           type: string
  *         required: true
- *         description: Nome de usuário do provedor
+ *         description: Nome de usuário do dono do negócio
+ *       - in: query
+ *         name: professionalId
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: ID do profissional para verificar a disponibilidade
+ *       - in: query
+ *         name: serviceId
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: ID do serviço desejado
  *       - in: query
  *         name: date
  *         schema:
@@ -119,28 +81,23 @@ router.get('/client/:id', publicController.getPublicClientProfile);
  *           format: date
  *         required: true
  *         description: Data para verificar a disponibilidade (YYYY-MM-DD)
+ *       - in: query
+ *         name: unitId
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *         required: false
+ *         description: ID da unidade para filtrar a disponibilidade
  *     responses:
  *       200:
- *         description: Disponibilidade do provedor retornada com sucesso
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 availableSlots:
- *                   type: array
- *                   items:
- *                     type: string
- *                     format: date-time
- *                     example: "2025-10-27T09:00:00Z"
+ *         description: Disponibilidade do profissional retornada com sucesso
  *       404:
- *         description: Provedor não encontrado
+ *         description: Negócio ou profissional não encontrado
  *       500:
  *         description: Erro interno do servidor
  */
 router.get('/availability/:username', publicController.getAvailability);
 
-// Route to create a new schedule from the public page
 /**
  * @swagger
  * /public/schedules:
@@ -154,17 +111,31 @@ router.get('/availability/:username', publicController.getAvailability);
  *           schema:
  *             type: object
  *             required:
- *               - providerUsername
+ *               - professionalId
+ *               - serviceId
+ *               - date
+ *               - time
  *               - clientName
  *               - clientEmail
- *               - clientPhone
- *               - serviceId
- *               - startTime
- *               - endTime
  *             properties:
- *               providerUsername:
+ *               professionalId:
  *                 type: string
- *                 example: provedor_exemplo
+ *                 description: ID do profissional selecionado para o agendamento.
+ *                 example: "123e4567-e89b-12d3-a456-426614174000"
+ *               serviceId:
+ *                 type: string
+ *                 description: ID do serviço selecionado.
+ *                 example: "123e4567-e89b-12d3-a456-426614174002"
+ *               date:
+ *                 type: string
+ *                 format: date
+ *                 description: Data do agendamento (YYYY-MM-DD).
+ *                 example: "2025-10-27"
+ *               time:
+ *                 type: string
+ *                 format: time
+ *                 description: Hora do agendamento (HH:MM).
+ *                 example: "10:00"
  *               clientName:
  *                 type: string
  *                 example: Cliente Público
@@ -175,37 +146,14 @@ router.get('/availability/:username', publicController.getAvailability);
  *               clientPhone:
  *                 type: string
  *                 example: "+5511987654321"
- *               serviceId:
+ *               unitId:
  *                 type: string
- *                 example: 123e4567-e89b-12d3-a456-426614174000
- *               startTime:
- *                 type: string
- *                 format: date-time
- *                 example: "2025-10-27T10:00:00Z"
- *               endTime:
- *                 type: string
- *                 format: date-time
- *                 example: "2025-10-27T11:00:00Z"
+ *                 format: uuid
+ *                 description: ID da unidade onde o agendamento será realizado (opcional).
+ *                 example: "123e4567-e89b-12d3-a456-426614174001"
  *     responses:
  *       201:
  *         description: Agendamento criado com sucesso
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: Agendamento criado com sucesso
- *                 schedule:
- *                   type: object
- *                   properties:
- *                     id:
- *                       type: string
- *                       example: 123e4567-e89b-12d3-a456-426614174000
- *                     providerUsername:
- *                       type: string
- *                       example: provedor_exemplo
  *       400:
  *         description: Dados inválidos ou horário indisponível
  *       500:
@@ -237,14 +185,6 @@ router.post('/schedules', publicController.createPublicSchedule);
  *     responses:
  *       200:
  *         description: Disponibilidade de depuração retornada com sucesso
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 debugInfo:
- *                   type: string
- *                   example: "Informações de depuração da disponibilidade."
  *       404:
  *         description: Provedor não encontrado
  *       500:
@@ -253,3 +193,4 @@ router.post('/schedules', publicController.createPublicSchedule);
 router.get('/debug/availability/:username', publicController.debugAvailability);
 
 module.exports = router;
+

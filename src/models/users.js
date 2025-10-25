@@ -1,4 +1,4 @@
-const sequelize = require('../config/database'); 
+const sequelize = require('../config/database');
 const { DataTypes } = require('sequelize');
 
 const User = sequelize.define('User', {
@@ -9,7 +9,7 @@ const User = sequelize.define('User', {
   },
   name: {
     type: DataTypes.STRING,
-    allowNull: false,     
+    allowNull: false,
   },
   email: {
     type: DataTypes.STRING,
@@ -29,13 +29,13 @@ const User = sequelize.define('User', {
     allowNull: false,
   },
   notificationToken: {
-  type: DataTypes.STRING,
-  allowNull: true,
-},
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
   role: {
-    type: DataTypes.ENUM('customer', 'provider'),
+    type: DataTypes.ENUM('customer', 'provider', 'owner'),
     allowNull: false,
-    defaultValue: 'customer', 
+    defaultValue: 'customer',
   },
   asaasCustomerId: {
     type: DataTypes.STRING,
@@ -57,15 +57,31 @@ const User = sequelize.define('User', {
     type: DataTypes.STRING,
     allowNull: true,
   },
+  professional_photo_url: { // Novo campo
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
   cor_perfil: {
     type: DataTypes.STRING,
     allowNull: true,
     defaultValue: '#FFFFFF' // Default to white
+  },
+  ownerId: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+    references: {
+      model: 'users',
+      key: 'id'
+    }
   }
 }, {
-  tableName: 'users',      
-  freezeTableName: true,   
+  tableName: 'users',
+  freezeTableName: true,
 });
+
+// Self-referencing association for owner/professional hierarchy
+User.hasMany(User, { as: 'professionals', foreignKey: 'ownerId', onDelete: 'CASCADE' });
+User.belongsTo(User, { as: 'owner', foreignKey: 'ownerId' });
 
 
 module.exports = User;

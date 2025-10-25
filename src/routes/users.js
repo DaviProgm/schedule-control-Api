@@ -13,7 +13,7 @@ const upload = multer({ storage: multer.memoryStorage() });
  * @swagger
  * /users/register:
  *   post:
- *     summary: Registra um novo usuário
+ *     summary: Registra um novo dono de negócio
  *     tags: [Users]
  *     requestBody:
  *       required: true
@@ -28,88 +28,105 @@ const upload = multer({ storage: multer.memoryStorage() });
  *             properties:
  *               name:
  *                 type: string
- *                 example: Nome do Usuário
+ *                 example: Nome do Dono
  *               email:
  *                 type: string
  *                 format: email
- *                 example: usuario@example.com
+ *                 example: dono@example.com
  *               password:
  *                 type: string
  *                 format: password
  *                 example: SenhaSegura123
  *     responses:
  *       201:
- *         description: Usuário registrado com sucesso
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: Usuário registrado com sucesso
- *                 user:
- *                   type: object
- *                   properties:
- *                     id:
- *                       type: string
- *                       example: 123e4567-e89b-12d3-a456-426614174000
- *                     name:s
- *                       type: string
- *                       example: Nome do Usuário
- *                     email:
- *                       type: string
- *                       example: usuario@example.com
- *       400:s
+ *         description: Dono do negócio registrado com sucesso
+ *       400:
  *         description: Erro na requisição
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: Email já cadastrado ou dados inválidos
  */
 router.post('/register',
   middlewareUsers.ValidateCreateUser,
-  UserController.CreateUser
+  UserController.RegisterOwner
 );
+
+/**
+ * @swagger
+ * /users/professionals:
+ *   post:
+ *     summary: Registra um novo profissional para o dono do negócio logado
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - name
+ *               - email
+ *               - password
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 example: Nome do Profissional
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 example: profissional@example.com
+ *               password:
+ *                 type: string
+ *                 format: password
+ *                 example: SenhaSegura123
+ *     responses:
+ *       201:
+ *         description: Profissional registrado com sucesso
+ *       403:
+ *         description: Não autorizado (apenas donos de negócio podem cadastrar)
+ */
+router.post('/professionals',
+  authMiddleware,
+  middlewareUsers.ValidateCreateUser,
+  UserController.createProfessional
+);
+
+/**
+ * @swagger
+ * /users/professionals:
+ *   get:
+ *     summary: Retorna a lista de profissionais do dono do negócio logado
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Lista de profissionais retornada com sucesso
+ *       401:
+ *         description: Não autorizado
+ */
+router.get('/professionals',
+  authMiddleware,
+  UserController.getProfessionalsByOwner
+);
+
 /**
  * @swagger
  * /users:
  *   get:
- *     summary: Retorna uma lista de usuários
+ *     summary: Retorna uma lista de todos os usuários (Admin)
  *     tags: [Users]
  *     security:
  *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: Lista de usuários retornada com sucesso
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 type: object
- *                 properties:
- *                   id:
- *                     type: string
- *                     example: 123e4567-e89b-12d3-a456-426614174000
- *                   name:
- *                     type: string
- *                     example: Nome do Usuário
- *                   email:
- *                     type: string
- *                     example: usuario@example.com
  *       401:
  *         description: Não autorizado
- *       500:
- *         description: Erro interno do servidor
  */
 router.get('/',
-  UserController.GetUsers
-)
+  authMiddleware, // Should add an admin check middleware here later
+  UserController.getAllUsers
+);
 
 /**
  * @swagger
@@ -139,31 +156,11 @@ router.get('/',
  *     responses:
  *       200:
  *         description: Perfil atualizado com sucesso
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: Perfil atualizado com sucesso
- *                 user:
- *                   type: object
- *                   properties:
- *                     id:
- *                       type: string
- *                       example: 123e4567-e89b-12d3-a456-426614174000
- *                     name:
- *                       type: string
- *                       example: Novo Nome
  *       400:
  *         description: Dados inválidos
  *       401:
  *         description: Não autorizado
- *       500:
- *         description: Erro interno do servidor
  */
-// Route to update the user's own profile (bio, username, etc.)
 router.put('/profile',
   authMiddleware,
   UserController.updateProfile
@@ -180,31 +177,11 @@ router.put('/profile',
  *     responses:
  *       200:
  *         description: Perfil do usuário retornado com sucesso
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 id:
- *                   type: string
- *                   example: 123e4567-e89b-12d3-a456-426614174000
- *                 name:
- *                   type: string
- *                   example: Nome do Usuário
- *                 email:
- *                   type: string
- *                   example: usuario@example.com
- *                 bio:
- *                   type: string
- *                   example: Minha biografia.
  *       401:
  *         description: Não autorizado
  *       404:
  *         description: Usuário não encontrado
- *       500:
- *         description: Erro interno do servidor
  */
-// Route to get the user's own profile
 router.get('/profile',
   authMiddleware,
   UserController.getProfile
@@ -232,25 +209,11 @@ router.get('/profile',
  *     responses:
  *       200:
  *         description: Foto de perfil atualizada com sucesso
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: Foto de perfil atualizada com sucesso
- *                 imageUrl:
- *                   type: string
- *                   example: http://example.com/path/to/image.jpg
  *       400:
  *         description: Nenhuma imagem fornecida ou formato inválido
  *       401:
  *         description: Não autorizado
- *       500:
- *         description: Erro interno do servidor
  */
-// Route to upload a profile photo
 router.post('/profile/photo', 
   authMiddleware, 
   upload.single('photo'), 
@@ -272,53 +235,52 @@ router.post('/profile/photo',
  *           type: string
  *         required: true
  *         description: ID do usuário
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - dayOfWeek
- *               - startTime
- *               - endTime
- *             properties:
- *               dayOfWeek:
- *                 type: number
- *                 description: Dia da semana (0 para Domingo, 1 para Segunda, etc.)
- *                 example: 1
- *               startTime:
- *                 type: string
- *                 format: time
- *                 example: "09:00"
- *               endTime:
- *                 type: string
- *                 format: time
- *                 example: "18:00"
  *     responses:
  *       200:
  *         description: Horas de trabalho padrão definidas com sucesso
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: Horas de trabalho padrão definidas com sucesso.
  *       400:
  *         description: Dados inválidos
  *       401:
  *         description: Não autorizado
  *       404:
  *         description: Usuário não encontrado
- *       500:
- *         description: Erro interno do servidor
  */
-// Route to set default work hours for a specific user
 router.post('/:userId/set-default-work-hours',
   authMiddleware,
   UserController.setDefaultWorkHours
+);
+
+/**
+ * @swagger
+ * /users/profile/professional-photo:
+ *   post:
+ *     summary: Faz upload da foto de profissional do usuário autenticado
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               professional_photo:
+ *                 type: string
+ *                 format: binary
+ *                 description: Arquivo da imagem de profissional
+ *     responses:
+ *       200:
+ *         description: Foto de profissional atualizada com sucesso
+ *       400:
+ *         description: Nenhuma imagem fornecida ou formato inválido
+ *       401:
+ *         description: Não autorizado
+ */
+router.post('/profile/professional-photo',
+  authMiddleware,
+  upload.single('professional_photo'),
+  UserController.uploadProfessionalPhoto
 );
 
 module.exports = router;

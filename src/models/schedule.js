@@ -3,6 +3,7 @@ const sequelize = require('../config/database');
 const User = require('./users');
 const Client = require('./clients');
 const Service = require('./service');
+const Unit = require('./unit'); // Novo
 
 const Schedule = sequelize.define('Schedule', {
   name: {
@@ -49,6 +50,14 @@ const Schedule = sequelize.define('Schedule', {
           model: 'services',
           key: 'id'
       }
+  },
+  unitId: {
+    type: DataTypes.UUID,
+    allowNull: true,
+    references: {
+      model: 'units',
+      key: 'id'
+    }
   }
 },
 {
@@ -66,5 +75,8 @@ Client.hasMany(Schedule, { foreignKey: 'clientId', as: 'schedules' });
 
 Schedule.belongsTo(Service, { foreignKey: 'serviceId', as: 'service' });
 Service.hasMany(Schedule, { foreignKey: 'serviceId', as: 'schedules' });
+
+Schedule.belongsTo(Unit, { foreignKey: 'unitId', as: 'unit' }); // Nova associação
+Unit.hasMany(Schedule, { foreignKey: 'unitId', as: 'schedules' }); // Nova associação
 
 module.exports = Schedule;

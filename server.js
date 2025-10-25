@@ -3,7 +3,7 @@ console.log('MAIL_HOST:', process.env.MAIL_HOST);
 const express = require('express');
 const sequelize = require('./src/config/database');
 const app = express();
-const port = 4005;
+const port = 4015;
 const swaggerUi = require('swagger-ui-express');
 const swaggerSpec = require('./src/config/swagger');
 const cors = require('cors');
@@ -26,6 +26,8 @@ require("./src/cron/sendUpcomingNotifications");
 require("./src/cron/sendHourlyReminders");
 require("./src/cron/sendProviderSummary");
 require("./src/cron/keepAlive.js"); // Adicionado para manter a API acordada na Render
+
+const UnitRouter = require('./src/routes/units'); // Novo
 
 app.use(cors({
   origin: '*'
@@ -58,6 +60,7 @@ app.use('/support-tickets', authMiddleware, SupportTicketRouter);
 app.use('/reports', authMiddleware, checkActiveSubscription, ReportsRouter);
 app.use('/services', ServiceRouter);
 app.use('/work-hours', WorkHourRouter);
+app.use('/units', UnitRouter); // Novo
 
 sequelize.sync({ alter: true }).then(() => {
   console.log('Banco de dados sincronizado');

@@ -32,17 +32,13 @@ const generateUniqueUsername = async (name) => {
   return username;
 };
 
-async function CreateUser(req, res) {
+async function RegisterOwner(req, res) {
     try {
-        const { name, email, password, role, cpfCnpj } = req.body;
-
-        const validRoles = ['customer', 'provider', 'admin', 'creditor'];
-        if (!validRoles.includes(role)) {
-            return res.status(400).send({ message: "Role inválido. Use: customer, creditor ou admin" });
-        }
+        const { name, email, password, cpfCnpj } = req.body;
 
         const hashPassword = await bcrypt.hash(password, 10);
-        const user = await User.create({ name, email, password: hashPassword, role });
+        // Owners are created with role 'owner' and null ownerId
+        const user = await User.create({ name, email, password: hashPassword, role: 'owner', ownerId: null });
 
         // Create customer in Asaas
         const asaasResponse = await axios.post(`${process.env.ASAAS_API_URL}/customers`, {
@@ -76,19 +72,78 @@ async function CreateUser(req, res) {
         await WorkHour.bulkCreate(defaultWorkHours);
         // --- End default work hours ---
 
-        await user.reload(); // Recarrega os dados do usuário do banco
+        await user.reload();
 
         return res.status(201).send(user);
     } catch (error) {
-        console.error('Erro ao criar usuário', error.response ? error.response.data : error.message);
+        console.error('Erro ao registrar dono', error.response ? error.response.data : error.message);
         return res.status(500).send({
-            message: "Erro ao criar usuário",
+            message: "Erro ao registrar dono",
             error: error.response ? error.response.data : error.message
         });
     }
 }
 
-async function GetUsers(req, res) {
+async function createProfessional(req, res) {
+    try {
+        const { name, email, password } = req.body;
+        const ownerId = req.user.id; // The logged-in user is the owner
+
+        // Check if the logged-in user is an owner
+        if (req.user.role !== 'owner') {
+            return res.status(403).send({ message: "Apenas donos de negócios podem cadastrar profissionais." });
+        }
+
+        const hashPassword = await bcrypt.hash(password, 10);
+        // Professionals are created with role 'provider' and the owner's ID
+        const user = await User.create({ name, email, password: hashPassword, role: 'provider', ownerId: ownerId });
+
+        // Professionals don't need to be customers in Asaas, so we skip that.
+        // If they do, that logic would be added here.
+
+        const username = await generateUniqueUsername(name);
+        await user.update({ username });
+
+        // --- Add default work hours for the new professional ---
+        const defaultWorkHours = [
+            { dayOfWeek: 0, startTime: "00:00", endTime: "00:00", isAvailable: false, userId: user.id },
+            { dayOfWeek: 1, startTime: "07:00", endTime: "19:00", isAvailable: true, userId: user.id },
+            { dayOfWeek: 2, startTime: "07:00", endTime: "19:00", isAvailable: true, userId: user.id },
+            { dayOfWeek: 3, startTime: "07:00", endTime: "19:00", isAvailable: true, userId: user.id },
+            { dayOfWeek: 4, startTime: "07:00", "endTime": "19:00", isAvailable: true, userId: user.id },
+            { dayOfWeek: 5, startTime: "07:00", "endTime": "19:00", isAvailable: true, userId: user.id },
+            { dayOfWeek: 6, startTime: "00:00", "endTime": "00:00", isAvailable: false, userId: user.id }
+        ];
+        await WorkHour.bulkCreate(defaultWorkHours);
+        
+        await user.reload();
+
+        return res.status(201).send(user);
+    } catch (error) {
+        console.error('Erro ao criar profissional', error.response ? error.response.data : error.message);
+        return res.status(500).send({
+            message: "Erro ao criar profissional",
+            error: error.response ? error.response.data : error.message
+        });
+    }
+}
+
+async function getProfessionalsByOwner(req, res) {
+    try {
+        const ownerId = req.user.id;
+        // Find all users (providers) that belong to the logged-in owner
+        const users = await User.findAll({ where: { ownerId: ownerId, role: 'provider' } })
+        return res.status(200).json(users);
+    } catch (error) {
+        console.error("Erro ao buscar profissionais", error);
+        return res.status(500).send({
+            message: 'Erro ao buscar profissionais',
+            error: error.message
+        });
+    }
+}
+
+async function getAllUsers(req, res) {
     try {
         const { role } = req.query;
         let where = {};
@@ -244,11 +299,58 @@ async function setDefaultWorkHours(req, res) {
     }
 }
 
+async function uploadProfessionalPhoto(req, res) {
+    try {
+        const userId = req.user.id;
+        const file = req.file;
+
+        if (!file) {
+            return res.status(400).send({ message: "Nenhum arquivo enviado." });
+        }
+
+        const user = await User.findByPk(userId);
+        if (!user) {
+            return res.status(404).send({ message: "Usuário não encontrado" });
+        }
+
+        // Usar um bucket/pasta diferente para fotos de profissional, se desejar
+        const fileName = `professional-pictures/${userId}-${Date.now()}`;
+        const { data, error } = await supabase.storage
+            .from('professional-pictures') // Pode ser um bucket diferente ou uma pasta dentro do mesmo bucket
+            .upload(fileName, file.buffer, {
+                contentType: file.mimetype,
+                upsert: true,
+            });
+
+        if (error) {
+            throw error;
+        }
+
+        const { data: { publicUrl } } = supabase.storage.from('professional-pictures').getPublicUrl(fileName);
+
+        await user.update({ professional_photo_url: publicUrl }); // Atualiza o novo campo
+
+        return res.status(200).json({
+            message: 'Foto de profissional atualizada com sucesso!',
+            url: publicUrl,
+        });
+    } catch (error) {
+        console.error("Erro ao fazer upload da foto de profissional", error);
+        return res.status(500).send({
+            message: 'Erro ao fazer upload da foto de profissional',
+            error: error.message,
+        });
+    }
+}
+
 module.exports = {
-    CreateUser,
-    GetUsers,
+    RegisterOwner,
+    createProfessional,
+    getProfessionalsByOwner,
+    getAllUsers,
     updateProfile,
     getProfile,
     setDefaultWorkHours,
-    uploadProfilePhoto
+    uploadProfilePhoto,
+    uploadProfessionalPhoto
 };

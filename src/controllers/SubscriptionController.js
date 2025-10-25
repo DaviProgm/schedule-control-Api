@@ -5,10 +5,16 @@ const ASAAS_API = process.env.ASAAS_API_URL;
 const ASAAS_TOKEN = process.env.ASAAS_TOKEN;
 
 exports.createSubscription = async (req, res) => {
-  const { userId, plan } = req.body;
+  // Only owners or users without an owner can create a subscription.
+  if (req.user.ownerId) {
+    return res.status(403).json({ error: "Profissionais não podem criar assinaturas. Apenas o dono do negócio pode." });
+  }
 
-  if (!userId || !plan) {
-    return res.status(400).json({ error: "userId e plan são obrigatórios" });
+  const userId = req.user.id; // Always use the logged-in user's ID
+  const { plan } = req.body;
+
+  if (!plan) {
+    return res.status(400).json({ error: "O 'plan' é obrigatório" });
   }
 
   try {
@@ -65,7 +71,10 @@ exports.createSubscription = async (req, res) => {
 
 exports.getSubscription = async (req, res) => {
   try {
-    const subscription = await Subscription.findOne({ where: { userId: req.user.id } });
+    // The user to check is the owner if it exists, otherwise it's the user themselves.
+    const userIdToCheck = req.user.ownerId || req.user.id;
+
+    const subscription = await Subscription.findOne({ where: { userId: userIdToCheck } });
 
     if (!subscription) {
       return res.status(404).json({ message: "Nenhuma assinatura encontrada." });
@@ -94,7 +103,9 @@ exports.getSubscription = async (req, res) => {
 
 exports.cancelSubscription = async (req, res) => {
   try {
-    const subscription = await Subscription.findOne({ where: { userId: req.user.id } });
+    // The user to check is the owner if it exists, otherwise it's the user themselves.
+    const userIdToCheck = req.user.ownerId || req.user.id;
+    const subscription = await Subscription.findOne({ where: { userId: userIdToCheck } });
 
     if (!subscription) {
       return res.status(404).json({ message: "Nenhuma assinatura encontrada para cancelar." });

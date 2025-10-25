@@ -9,6 +9,9 @@ const Payment = require('./payment');
 const SupportTicket = require('./supportTicket');
 const Service = require('./service');
 const WorkHour = require('./workHour');
+const Unit = require('./unit'); // Novo
+const UserUnit = require('./userUnit'); // Novo
+const ServiceUnit = require('./serviceUnit'); // Novo
 
 const db = {
   Sequelize, // Add this line
@@ -21,6 +24,9 @@ const db = {
   SupportTicket,
   Service,
   WorkHour,
+  Unit, // Novo
+  UserUnit, // Novo
+  ServiceUnit, // Novo
 };
 
 // This is a placeholder for running associations if they were defined in a separate method
